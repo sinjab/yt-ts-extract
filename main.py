@@ -34,7 +34,7 @@ class Snake:
         cur = self.get_head_position()
         x, y = self.direction
         new = ((cur[0] + x) % GRID_WIDTH, (cur[1] + y) % GRID_HEIGHT)
-        if new in self.positions[3:]:
+        if new in self.positions[1:]:
             return False
         self.positions.insert(0, new)
         if len(self.positions) > self.length:
@@ -60,9 +60,12 @@ class Food:
         self.color = RED
         self.randomize_position()
 
-    def randomize_position(self):
-        self.position = (random.randint(0, GRID_WIDTH-1),
-                        random.randint(0, GRID_HEIGHT-1))
+    def randomize_position(self, snake_positions):
+        while True:
+            self.position = (random.randint(0, GRID_WIDTH-1),
+                           random.randint(0, GRID_HEIGHT-1))
+            if self.position not in snake_positions:
+                break
 
     def render(self, surface):
         pygame.draw.rect(surface, self.color,
@@ -104,19 +107,33 @@ def main():
     font = pygame.font.Font(None, 36)
 
     while True:
-        clock.tick(10)
+        clock.tick(15)
         handle_keys(snake)
         
         # Update game state
         if not snake.update():
+            # Show game over text
+            game_over_text = font.render("Game Over! Press any key...", True, WHITE)
+            screen.blit(game_over_text, (WINDOW_WIDTH//2 - 140, WINDOW_HEIGHT//2 - 20))
+            pygame.display.update()
+            
+            # Wait for key press
+            while True:
+                event = pygame.event.wait()
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    sys.exit()
+                elif event.type == pygame.KEYDOWN:
+                    break
+                    
             snake.reset()
-            food.randomize_position()
+            food.randomize_position(snake.positions)
         
         # Check if snake ate the food
         if snake.get_head_position() == food.position:
             snake.length += 1
             snake.score += 1
-            food.randomize_position()
+            food.randomize_position(snake.positions)
 
         # Draw everything
         surface.fill(BLACK)
