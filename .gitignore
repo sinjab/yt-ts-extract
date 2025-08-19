@@ -1,2 +1,5 @@
 .aider*
 .env
+.python-version
+uv.lock
+*.code-workspace
