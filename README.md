@@ -4,25 +4,20 @@
 [![Python Support](https://img.shields.io/pypi/pyversions/yt-ts-extract.svg)](https://pypi.org/project/yt-ts-extract/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-A robust Python library and CLI tool for extracting YouTube video transcripts with multi-language support and various output formats.
+A robust Python library and CLI tool for extracting YouTube video transcripts with multi-language support and proxy rotation capabilities.
 
 ## ✨ Key Features
 
-### 🎯 Core Functionality
 - **Extract transcripts** from YouTube videos via video ID
 - **26+ language support** (English, Spanish, French, German, Japanese, Arabic, Chinese, etc.)
 - **Multiple output formats**: plain text, SRT subtitles, timestamped segments, JSON
 - **Batch processing** for multiple videos
+- **Anti-bot protection**: Android client implementation bypasses detection
+- **Proxy rotation**: Multiple proxy support with automatic rotation strategies
 - **Both CLI and Python library** interfaces
 
-### 🛡️ Technical Highlights
-- **Anti-bot protection**: Android client implementation bypasses detection
-- **Dual XML parser**: Handles both legacy and current YouTube formats
-- **Robust extraction**: API key extraction with fallback systems
-- **Rate limiting**: Built-in protection prevents IP blocking
-- **Error handling**: Comprehensive error handling and recovery
-
 ## 🚀 Installation
+
 ```bash
 # Install from PyPI
 pip install yt-ts-extract
@@ -37,10 +32,8 @@ pip install -e .
 
 ### Command Line Interface
 
-After installation, use the `yt-transcript` command:
-
 ```bash
-# Basic transcript extraction (pass a video ID)
+# Basic transcript extraction
 yt-transcript dQw4w9WgXcQ
 
 # Export as SRT subtitles
@@ -49,7 +42,7 @@ yt-transcript -f srt -o video.srt dQw4w9WgXcQ
 # List available languages
 yt-transcript --list-languages dQw4w9WgXcQ
 
-# Batch process multiple videos (file of IDs)
+# Batch process multiple videos
 yt-transcript --batch ids.txt --output-dir ./transcripts/
 
 # Get help
@@ -67,7 +60,7 @@ from yt_ts_extract import (
 )
 from yt_ts_extract.utils import export_to_srt, get_transcript_stats
 
-# Quick transcript extraction (ID only)
+# Quick transcript extraction
 transcript = get_transcript("dQw4w9WgXcQ")
 print(f"Segments: {len(transcript)}")
 
@@ -81,12 +74,12 @@ text = get_transcript_text("dQw4w9WgXcQ")
 langs = get_available_languages("dQw4w9WgXcQ")
 print(f"Languages available: {[l['code'] for l in langs]}")
 
-# Or using the class directly
+# Using the class directly
 extractor = YouTubeTranscriptExtractor(
-    timeout=20,        # per-request timeout (seconds)
-    max_retries=5,     # HTTP retries on transient failures
-    backoff_factor=1.0,# exponential backoff factor
-    min_delay=1.5      # minimum delay between requests (rate limiting)
+    timeout=20,
+    max_retries=5,
+    backoff_factor=1.0,
+    min_delay=1.5
 )
 segments = extractor.get_transcript("dQw4w9WgXcQ", language="en")
 stats = get_transcript_stats(segments)
@@ -99,29 +92,26 @@ print(stats)
 yt-transcript [OPTIONS] VIDEO_ID
 
 Options:
-  -f, --format [text|srt|segments|stats]
-                          Output format (default: text)
-  -o, --output PATH      Save output to file
-  -l, --language TEXT    Language code (e.g., 'en', 'es', 'fr')
-  --list-languages       Show available languages for video
-  --batch PATH           Process video IDs from file (one per line)
-  --output-dir PATH      Directory for batch output files
-  --search TEXT          Search for specific text in transcript
-  --examples             Show usage examples
-  --timeout FLOAT        Per-request timeout in seconds (default: 30)
-  --retries INT          Max HTTP retries on failure (default: 3)
-  --backoff FLOAT        Exponential backoff factor (default: 0.75)
-  --min-delay FLOAT      Minimum delay between requests for rate limiting (default: 2)
-  --proxy TEXT           Proxy URL (e.g., "http://user:pass@host:port" or "http://host:port")
-  --proxy-list PATH      Proxy list file for rotation (space/tab separated: Address Port Username Password)
+  -f, --format [text|srt|segments|stats]  Output format (default: text)
+  -o, --output PATH                       Save output to file
+  -l, --language TEXT                     Language code (e.g., 'en', 'es', 'fr')
+  --list-languages                        Show available languages for video
+  --batch PATH                            Process video IDs from file (one per line)
+  --output-dir PATH                       Directory for batch output files
+  --search TEXT                           Search for specific text in transcript
+  --examples                              Show usage examples
+  --timeout FLOAT                         Per-request timeout in seconds (default: 30)
+  --retries INT                           Max HTTP retries on failure (default: 3)
+  --backoff FLOAT                         Exponential backoff factor (default: 0.75)
+  --min-delay FLOAT                       Minimum delay between requests (default: 2)
+  --proxy TEXT                            Proxy URL (e.g., "http://user:pass@host:port")
+  --proxy-list PATH                       Proxy list file for rotation
   --rotation-strategy [random|round_robin|least_used]  Proxy rotation strategy (default: random)
-  --health-check         Perform health check on all proxies before starting
-  --help                 Show this message and exit
+  --health-check                          Perform health check on all proxies before starting
+  --help                                  Show this message and exit
 ```
 
-### Network resilience tuning
-
-You can tune network behavior to improve reliability in flaky environments or speed up trusted CI environments:
+### Network Tuning Examples
 
 ```bash
 # Increase retries and timeout
@@ -130,24 +120,19 @@ yt-transcript dQw4w9WgXcQ --retries 5 --timeout 45
 # Reduce delay for faster runs (use responsibly)
 yt-transcript dQw4w9WgXcQ --min-delay 1.0 --backoff 0.5
 
-# Use proxy for network routing
+# Single proxy
 yt-transcript dQw4w9WgXcQ --proxy "http://user:pass@host:port"
-
-# Proxy with custom timeout
-yt-transcript dQw4w9WgXcQ --proxy "http://host:port" --timeout 60
 
 # Proxy rotation with health check
 yt-transcript dQw4w9WgXcQ --proxy-list proxies.txt --health-check
 
-# Proxy rotation with custom strategy and timeout
-yt-transcript dQw4w9WgXcQ --proxy-list proxies.txt --rotation-strategy round_robin --timeout 45
+# Batch processing with proxy rotation
+yt-transcript --batch ids.txt --proxy-list proxies.txt --output-dir transcripts/
 ```
 
-### Proxy Support
+## 🔄 Proxy Support
 
-The tool supports both single proxies and **proxy rotation** for enhanced reliability:
-
-#### Single Proxy
+### Single Proxy
 
 ```bash
 # HTTP proxy with authentication
@@ -158,12 +143,9 @@ yt-transcript --proxy "https://proxy-host:8443" dQw4w9WgXcQ
 
 # SOCKS5 proxy
 yt-transcript --proxy "socks5://user:pass@proxy-host:1080" dQw4w9WgXcQ
-
-# Batch processing with proxy
-yt-transcript --batch ids.txt --proxy "http://host:port" --output-dir transcripts/
 ```
 
-#### 🔄 Proxy Rotation (NEW!)
+### Proxy Rotation
 
 Load multiple proxies from a file and automatically rotate between them:
 
@@ -176,9 +158,6 @@ yt-transcript --proxy-list proxies.txt --rotation-strategy round_robin dQw4w9WgX
 
 # With health check
 yt-transcript --proxy-list proxies.txt --health-check dQw4w9WgXcQ
-
-# Batch processing with proxy rotation
-yt-transcript --batch ids.txt --proxy-list proxies.txt --output-dir transcripts/
 ```
 
 **Proxy List File Format** (`proxies.txt`):
@@ -192,14 +171,12 @@ Address Port Username Password
 136.0.207.84 6661 mhzbhrwb yj2veiaafrbu
 ```
 
-> **Note**: The above proxy list has been tested and verified to work with the YouTube transcript extractor. These proxies support HTTP authentication and are configured for reliable transcript extraction.
-
 **Rotation Strategies:**
 - `random`: Random proxy selection (default)
 - `round_robin`: Cycle through proxies in order
 - `least_used`: Select least recently used proxy
 
-In Python code:
+### Python Proxy Usage
 
 ```python
 from yt_ts_extract import YouTubeTranscriptExtractor, ProxyManager
@@ -224,42 +201,11 @@ from yt_ts_extract import get_transcript_with_proxy_rotation
 transcript = get_transcript_with_proxy_rotation("dQw4w9WgXcQ", "proxies.txt")
 ```
 
-**Proxy Rotation Best Practices:**
-- **Health Checks**: Use `--health-check` to verify proxy connectivity before processing
-- **Rotation Strategy**: Use `round_robin` for even distribution, `least_used` for load balancing
-- **Failover**: Failed proxies are automatically deactivated and reactivated after cooldown
-- **Rate Limiting**: Each proxy respects minimum delay between requests
-- **Monitoring**: Check proxy stats with `extractor.get_proxy_stats()`
-
-**Troubleshooting:**
-- If proxies fail health checks, verify credentials and connectivity
-- Increase `--timeout` for slower proxy connections
-- Use `--retries` to handle temporary proxy failures
-- Monitor proxy health during batch processing
-
-**Advanced Proxy Management:**
-```python
-from yt_ts_extract import ProxyManager
-
-# Custom proxy manager settings
-proxy_manager = ProxyManager(
-    proxy_configs=ProxyManager.from_file("proxies.txt").proxy_configs,
-    rotation_strategy="least_used",
-    health_check_url="https://www.youtube.com",  # Custom health check URL
-    health_check_timeout=15.0,
-    max_failures=2,  # Deactivate after 2 failures
-    failure_cooldown=300.0,  # 5 minutes cooldown
-    min_delay_between_requests=2.0  # 2 seconds between requests
-)
-
-# Health monitoring
-health_results = proxy_manager.health_check_all()
-stats = proxy_manager.get_stats()
-print(f"Active proxies: {stats['active_proxies']}/{stats['total_proxies']}")
-
-# Manual proxy management
-proxy_manager.reactivate_proxies()  # Reactivate failed proxies after cooldown
-```
+**Proxy Best Practices:**
+- Use `--health-check` to verify proxy connectivity before processing
+- Failed proxies are automatically deactivated and reactivated after cooldown
+- Each proxy respects minimum delay between requests
+- Monitor proxy health with `extractor.get_proxy_stats()`
 
 ## 📊 Output Formats
 
@@ -324,7 +270,7 @@ Supports 26+ languages with automatic detection:
 | Hindi | `hi` | Dutch | `nl` |
 | Polish | `pl` | Turkish | `tr` |
 
-And many more! Use `--list-languages` to see available languages for any video.
+Use `--list-languages` to see available languages for any video.
 
 ## 🔧 Advanced Usage
 
@@ -349,7 +295,7 @@ yt-transcript --batch ids.txt --format srt --output-dir ./subtitles/
 yt-transcript --search "machine learning" VIDEO_ID
 ```
 
-### Python Library Advanced Features
+### Advanced Python Features
 
 ```python
 from yt_ts_extract import YouTubeTranscriptExtractor
@@ -380,29 +326,14 @@ X-YouTube-Client-Version: 20.10.38
 Content-Type: application/json
 ```
 
-This approach mimics the official Android YouTube app, making requests appear as legitimate mobile traffic.
-
 ### Dual XML Parser System
-The library supports both legacy and current YouTube transcript formats:
 - **Legacy format**: Direct XML transcript data
 - **Current format**: API-based JSON responses with embedded XML
 
 ### Proxy Architecture
-The new proxy rotation system provides enterprise-grade reliability:
-
-```python
-# Proxy rotation strategies
-rotation_strategies = {
-    'random': 'Random selection for load distribution',
-    'round_robin': 'Sequential rotation for even usage', 
-    'least_used': 'Smart selection based on usage stats'
-}
-
-# Health monitoring
-- Automatic proxy health checks
-- Failed proxy deactivation with cooldown
-- Real-time proxy statistics and monitoring
-```
+- **Rotation strategies**: random, round_robin, least_used
+- **Health monitoring**: Automatic health checks and failed proxy deactivation
+- **Recovery**: Reactivation after cooldown periods
 
 ### Error Handling & Recovery
 - **Exponential backoff**: Prevents overwhelming servers during failures
@@ -411,8 +342,6 @@ rotation_strategies = {
 - **Rate limiting**: Built-in delays prevent IP-based blocking
 
 ## 🧪 Testing
-
-The project includes comprehensive testing:
 
 ```bash
 # Run all tests
@@ -424,9 +353,6 @@ uv run pytest --cov=yt_ts_extract --cov-report=term-missing
 # Run specific test suites
 uv run pytest tests/test_proxy_manager.py -v
 uv run pytest tests/test_e2e_proxy.py -v
-
-# End-to-end testing
-uv run pytest tests/test_e2e_cli.py -v
 ```
 
 ### Test Categories
