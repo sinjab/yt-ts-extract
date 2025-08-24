@@ -1,5 +1,5 @@
-# AI coding assistants
-.aider*
+# Virtual environment
+.venv/
 
 # Environment files
 .env
@@ -42,13 +42,6 @@ share/python-wheels/
 *.egg
 MANIFEST
 
-# Virtual environments
-venv/
-env/
-ENV/
-env.bak/
-venv.bak/
-
 # Debug files
 debug_*.py
 debug_*.html
@@ -72,6 +65,6 @@ ehthumbs.db
 Thumbs.db
 
 # Test outputs (keep test.srt as example)
-test_*.srt
-test_*.json
-test_*.txt
+*.srt
+*.json
+*.txt
