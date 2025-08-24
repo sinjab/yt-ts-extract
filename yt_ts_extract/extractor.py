@@ -81,13 +81,15 @@ class YouTubeTranscriptExtractor:
         elif proxy_manager:
             # Proxy rotation mode
             logger.info(
-                f"Configured proxy rotation with {len(proxy_manager)} proxies, strategy: {proxy_manager.rotation_strategy}"
+                f"Configured proxy rotation with {len(proxy_manager)} proxies, "
+                f"strategy: {proxy_manager.rotation_strategy}"
             )
 
         # Essential headers to mimic legitimate browser requests
         self.session.headers.update(
             {
-                "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36",
+                "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 "
+                              "(KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36",
                 "Accept-Language": "en-US,en;q=0.9",
                 "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
                 "Accept-Encoding": "gzip, deflate, br",
@@ -554,7 +556,7 @@ class YouTubeTranscriptExtractor:
     def _select_best_track(
         self, tracks: List[Dict], language: str, prefer_manual: bool
     ) -> Optional[Dict]:
-        """Select the best caption track based on language and preference""" """Select the best caption track based on language and preference"""
+        """Select the best caption track based on language and preference"""
         matching_tracks = [t for t in tracks if t.get("languageCode") == language]
 
         if not matching_tracks:

@@ -115,7 +115,8 @@ Examples:
     )
     parser.add_argument(
         "--proxy",
-        help='🔒 Proxy URL for network routing (e.g., "http://user:pass@host:port", "https://host:port", "socks5://host:port")',
+        help='🔒 Proxy URL for network routing (e.g., "http://user:pass@host:port", '
+             '"https://host:port", "socks5://host:port")',
     )
     parser.add_argument(
         "--proxy-list",
@@ -177,7 +178,8 @@ Examples:
             # Show proxy stats
             stats = proxy_manager.get_stats()
             print(
-                f"🔄 Using proxy rotation: {stats['active_proxies']}/{stats['total_proxies']} proxies active, strategy: {stats['rotation_strategy']}"
+                f"🔄 Using proxy rotation: {stats['active_proxies']}/{stats['total_proxies']} "
+                f"proxies active, strategy: {stats['rotation_strategy']}"
             )
 
         except Exception as e:
