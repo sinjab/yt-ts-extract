@@ -318,13 +318,14 @@ def get_transcript_stats(transcript: List[Dict]) -> Dict:
     }
 
 
-def batch_process_ids(video_ids: List[str], output_dir: str = "transcripts/") -> Dict:
+def batch_process_ids(video_ids: List[str], output_dir: str = "transcripts/", proxy: Optional[str] = None) -> Dict:
     """
     Process multiple YouTube video IDs and save transcripts.
     
     Args:
         video_ids: List of YouTube video IDs
         output_dir: Directory to save transcripts
+        proxy: Proxy URL in format "http://username:password@host:port" or "http://host:port" (default: None)
     
     Returns:
         Processing results summary
@@ -336,11 +337,11 @@ def batch_process_ids(video_ids: List[str], output_dir: str = "transcripts/") ->
             "dQw4w9WgXcQ",
             "9bZkp7q19f0"
         ]
-        results = batch_process_ids(ids, "my_transcripts/")
+        results = batch_process_ids(ids, "my_transcripts/", proxy="http://user:pass@host:port")
     """
     from .extractor import YouTubeTranscriptExtractor
     
-    extractor = YouTubeTranscriptExtractor()
+    extractor = YouTubeTranscriptExtractor(proxy=proxy)
     results = {
         'successful': [],
         'failed': [],

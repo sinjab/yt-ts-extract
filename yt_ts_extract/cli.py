@@ -26,6 +26,12 @@ Examples:
   %(prog)s -f stats --keywords 10 dQw4w9WgXcQ
   %(prog)s --search "artificial intelligence" dQw4w9WgXcQ
   %(prog)s --batch ids.txt --output-dir transcripts/
+  
+🔒 Proxy Examples:
+  %(prog)s --proxy "http://user:pass@host:port" dQw4w9WgXcQ
+  %(prog)s --proxy "https://host:port" --timeout 60 dQw4w9WgXcQ
+  %(prog)s --proxy "socks5://host:port" --retries 5 dQw4w9WgXcQ
+  %(prog)s --batch ids.txt --proxy "http://host:port" --output-dir transcripts/
         """
     )
     
@@ -69,6 +75,8 @@ Examples:
                         help='Exponential backoff factor (default: 0.75)')
     parser.add_argument('--min-delay', dest='min_delay', type=float, default=2.0,
                         help='Minimum delay between requests for rate limiting (default: 2)')
+    parser.add_argument('--proxy', 
+                        help='🔒 Proxy URL for network routing (e.g., "http://user:pass@host:port", "https://host:port", "socks5://host:port")')
     
     args = parser.parse_args()
     
@@ -90,6 +98,7 @@ Examples:
         max_retries=args.retries,
         backoff_factor=args.backoff,
         min_delay=args.min_delay,
+        proxy=args.proxy,
     )
     
     try:
@@ -197,7 +206,7 @@ def handle_batch_processing(args):
         sys.exit(1)
     
     print(f"Processing {len(ids)} video IDs...")
-    results = batch_process_ids(ids, args.output_dir)
+    results = batch_process_ids(ids, args.output_dir, proxy=args.proxy)
     
     # Print detailed results
     print(f"\nDetailed Results:")
@@ -226,11 +235,26 @@ def run_examples():
         ("List languages", 'yt-transcript --list-languages dQw4w9WgXcQ'),
         ("Batch processing", 'yt-transcript --batch ids.txt --output-dir transcripts/'),
         ("Timestamped segments", 'yt-transcript -f segments dQw4w9WgXcQ'),
+        ("", ""),  # Empty line for separation
+        ("🔒 PROXY EXAMPLES:", ""),
+        ("HTTP proxy with auth", 'yt-transcript --proxy "http://user:pass@host:port" dQw4w9WgXcQ'),
+        ("HTTP proxy without auth", 'yt-transcript --proxy "http://host:port" dQw4w9WgXcQ'),
+        ("HTTPS proxy", 'yt-transcript --proxy "https://secure-host:8443" dQw4w9WgXcQ'),
+        ("SOCKS5 proxy", 'yt-transcript --proxy "socks5://user:pass@host:1080" dQw4w9WgXcQ'),
+        ("Proxy with custom timeout", 'yt-transcript --proxy "http://host:port" --timeout 60 dQw4w9WgXcQ'),
+        ("Proxy with retries", 'yt-transcript --proxy "http://host:port" --retries 5 dQw4w9WgXcQ'),
+        ("Batch processing with proxy", 'yt-transcript --batch ids.txt --proxy "http://host:port" --output-dir transcripts/'),
+        ("Proxy with all options", 'yt-transcript --proxy "http://user:pass@host:port" --timeout 60 --retries 5 --min-delay 1.0 dQw4w9WgXcQ'),
     ]
     
     for description, command in examples:
-        print(f"\n{description}:")
-        print(f"  {command}")
+        if description == "" and command == "":
+            print()  # Empty line
+        elif description.startswith("🔒"):
+            print(f"\n{description}")
+        else:
+            print(f"\n{description}:")
+            print(f"  {command}")
     
     print(f"\n{'='*50}")
     print("Create a file 'ids.txt' with YouTube video IDs (one per line) for batch processing.")
@@ -238,6 +262,13 @@ def run_examples():
     print("  dQw4w9WgXcQ")
     print("  9bZkp7q19f0")
     print("  # This is a comment - lines starting with # are ignored")
+    print(f"\n{'='*50}")
+    print("🔒 PROXY USAGE TIPS:")
+    print("• Use HTTPS proxies when possible for security")
+    print("• Set appropriate timeouts for proxy connections")
+    print("• Increase retry count for proxy connections")
+    print("• Test proxy connectivity before batch processing")
+    print("• Use authentication for corporate proxies")
 
 
 if __name__ == "__main__":

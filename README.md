@@ -112,6 +112,7 @@ Options:
   --retries INT          Max HTTP retries on failure (default: 3)
   --backoff FLOAT        Exponential backoff factor (default: 0.75)
   --min-delay FLOAT      Minimum delay between requests for rate limiting (default: 2)
+  --proxy TEXT           Proxy URL (e.g., "http://user:pass@host:port" or "http://host:port")
   --help                 Show this message and exit
 ```
 
@@ -125,6 +126,47 @@ yt-transcript dQw4w9WgXcQ --retries 5 --timeout 45
 
 # Reduce delay for faster runs (use responsibly)
 yt-transcript dQw4w9WgXcQ --min-delay 1.0 --backoff 0.5
+
+# Use proxy for network routing
+yt-transcript dQw4w9WgXcQ --proxy "http://user:pass@host:port"
+
+# Proxy with custom timeout
+yt-transcript dQw4w9WgXcQ --proxy "http://host:port" --timeout 60
+```
+
+### Proxy Support
+
+The tool supports HTTP, HTTPS, and SOCKS proxies for network routing:
+
+```bash
+# HTTP proxy with authentication
+yt-transcript --proxy "http://username:password@proxy-host:8080" dQw4w9WgXcQ
+
+# HTTPS proxy
+yt-transcript --proxy "https://proxy-host:8443" dQw4w9WgXcQ
+
+# SOCKS5 proxy
+yt-transcript --proxy "socks5://user:pass@proxy-host:1080" dQw4w9WgXcQ
+
+# Batch processing with proxy
+yt-transcript --batch ids.txt --proxy "http://host:port" --output-dir transcripts/
+```
+
+In Python code:
+
+```python
+from yt_ts_extract import YouTubeTranscriptExtractor
+
+# Initialize with proxy
+extractor = YouTubeTranscriptExtractor(
+    proxy="http://user:pass@host:port",
+    timeout=30,
+    max_retries=3
+)
+
+# Use convenience functions with proxy
+from yt_ts_extract import get_transcript
+transcript = get_transcript("dQw4w9WgXcQ", proxy="http://host:port")
 ```
 
 ## 📊 Output Formats
@@ -239,168 +281,5 @@ print(f"Word count: {stats['word_count']} words")
 ### Android Client Implementation
 The extractor uses Android YouTube client headers to bypass anti-bot measures:
 
-```python
-headers = {
-    'User-Agent': 'com.google.android.youtube/20.10.38 (Linux; U; Android 14)',
-    'X-YouTube-Client-Name': '3',
-    'X-YouTube-Client-Version': '20.10.38',
-}
 ```
-
-### Dual XML Format Support
-Handles both YouTube's legacy and current transcript formats:
-
-- **Legacy**: `<text start="160" dur="2800">content</text>`
-- **Current**: `<p t="160" d="2800"><s>content</s></p>`
-
-### Rate Limiting & Error Handling
-- Built-in delays prevent IP blocking
-- Multiple API key extraction methods
-- Graceful fallbacks for various error conditions
-- Comprehensive logging for debugging
-
-## 🧪 Testing
-
-### Running the tests
-
-```bash
-# Using uv (recommended)
-uv run pytest -q
-
-# Or using your environment directly
-pytest -q
-
-# Run a specific test file or test
-uv run pytest tests/test_cli_batch.py -q
-uv run pytest -q -k test_get_transcript_text_joins_without_network
-
-# With coverage summary
-uv run pytest --maxfail=1 --disable-warnings -q --cov=yt_ts_extract --cov-report=term
 ```
-
-Note: The suite assumes the package accepts only YouTube video IDs (not full URLs) in both library and CLI usage.
-
-The library has been tested with various video types:
-
-### Test Results
-
-**Physics Lecture Video** (`wIwCTQZ_xFE`)
-- ✅ 377 transcript segments extracted
-- ✅ 26 language tracks detected
-- ✅ Complete lecture content captured
-
-**Music Video** (`dQw4w9WgXcQ`)
-- ✅ 61 transcript segments extracted
-- ✅ 6 language tracks available
-- ✅ Perfect SRT format export
-
-### End-to-end (E2E) tests
-
-E2E tests hit real YouTube endpoints and are marked with `@pytest.mark.e2e`.
-
-```bash
-# Run only E2E tests
-uv run pytest -q -m e2e
-
-# Example: run a single E2E test file
-uv run pytest -q tests/test_e2e_cli.py -m e2e
-```
-
-**Educational Content** (`9bZkp7q19f0`)
-- ✅ Multiple language support verified
-- ✅ Batch processing functionality confirmed
-- ✅ Search functionality working
-
-## 🛠️ Development
-
-### Setup Development Environment
-
-```bash
-git clone https://github.com/sinjab/yt-ts-extract.git
-cd yt-ts-extract
-
-# Install in development mode with dev dependencies
-pip install -e .[dev]
-
-# Run tests
-pytest
-
-# Format code
-black yt_ts_extract/
-isort yt_ts_extract/
-```
-
-### Project Structure
-
-```
-yt_ts_extract/
-├── __init__.py          # Public API exports
-├── extractor.py         # Core transcript extraction logic
-├── utils.py             # Utility functions
-├── cli.py               # Command-line interface
-└── examples/
-    ├── __init__.py
-    └── basic_usage.py   # Usage examples
-```
-
-### Building and Publishing
-
-```bash
-# Build the package
-python -m build
-
-# Upload to PyPI
-twine upload dist/*
-```
-
-## 📚 Examples
-
-Check out the `examples/` directory for more detailed usage examples:
-
-```python
-# Run built-in examples
-from yt_ts_extract.examples import run_examples
-run_examples()
-```
-
-Or from CLI:
-```bash
-yt-transcript --examples
-```
-
-## ⚠️ Limitations & Considerations
-
-- **YouTube Terms of Service**: Ensure your usage complies with YouTube's ToS
-- **Rate Limiting**: Built-in delays prevent blocking, but excessive usage may trigger limits
-- **Video Availability**: Some videos may not have transcripts or may be geo-blocked
-- **Language Detection**: Auto-generated transcripts may have varying quality
-
-## 🤝 Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request. For major changes:
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 🙏 Acknowledgments
-
-- Built to provide a robust alternative to existing YouTube transcript tools
-- Implements advanced anti-detection techniques for reliable operation
-- Designed with both developer and end-user experience in mind
-
-## 📞 Support
-
-- **Documentation**: Check this README and built-in help (`yt-transcript --help`)
-- **Issues**: [GitHub Issues](https://github.com/sinjab/yt-ts-extract/issues)
-- **Examples**: Run `yt-transcript --examples` for interactive examples
-
----
-
-**Status**: Production-ready library for extracting YouTube transcripts with comprehensive multi-language support and robust error handling.

@@ -42,7 +42,7 @@ class YouTubeTranscriptExtractor:
         languages = extractor.get_available_languages("dQw4w9WgXcQ")
     """
     
-    def __init__(self, *, timeout: float = 30, max_retries: int = 3, backoff_factor: float = 0.75, min_delay: float = 2):
+    def __init__(self, *, timeout: float = 30, max_retries: int = 3, backoff_factor: float = 0.75, min_delay: float = 2, proxy: Optional[str] = None):
         """Initialize the extractor with session, headers, and resilience controls.
 
         Args:
@@ -50,6 +50,7 @@ class YouTubeTranscriptExtractor:
             max_retries: number of HTTP retry attempts on failure (default: 3)
             backoff_factor: base backoff factor for retries (default: 0.75)
             min_delay: minimum delay between requests for rate limiting (default: 2)
+            proxy: proxy URL in format "http://username:password@host:port" or "http://host:port" (default: None)
         """
         self.session = requests.Session()
         self.last_request_time = 0
@@ -58,6 +59,14 @@ class YouTubeTranscriptExtractor:
         self.timeout = float(timeout)
         self.max_retries = int(max_retries)
         self.backoff_factor = float(backoff_factor)
+        
+        # Configure proxy if provided
+        if proxy:
+            self.session.proxies = {
+                'http': proxy,
+                'https': proxy
+            }
+            logger.info(f"Configured proxy: {proxy.split('@')[-1] if '@' in proxy else proxy}")
         
         # Essential headers to mimic legitimate browser requests
         self.session.headers.update({

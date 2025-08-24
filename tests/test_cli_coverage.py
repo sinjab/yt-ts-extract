@@ -302,7 +302,7 @@ class TestCLIFunctionCoverage:
         ids_file.write_text("vid1\nvid2\n", encoding="utf-8")
         
         # Mock the batch_process_ids function
-        def fake_batch_process_ids(ids, output_dir):
+        def fake_batch_process_ids(ids, output_dir, proxy=None):
             return {
                 'successful': [
                     {
