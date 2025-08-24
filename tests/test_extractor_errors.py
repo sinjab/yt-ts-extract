@@ -26,7 +26,10 @@ def test_extract_caption_tracks_unknown_status():
 
 def test_extract_caption_tracks_no_tracks():
     e = YouTubeTranscriptExtractor()
-    data = {"playabilityStatus": {"status": "OK"}, "captions": {"playerCaptionsTracklistRenderer": {"captionTracks": []}}}
+    data = {
+        "playabilityStatus": {"status": "OK"},
+        "captions": {"playerCaptionsTracklistRenderer": {"captionTracks": []}},
+    }
     with pytest.raises(Exception) as ei:
         e.extract_caption_tracks(data)
     assert "No transcripts available" in str(ei.value)

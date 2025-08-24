@@ -116,7 +116,7 @@ Examples:
     parser.add_argument(
         "--proxy",
         help='🔒 Proxy URL for network routing (e.g., "http://user:pass@host:port", '
-             '"https://host:port", "socks5://host:port")',
+        '"https://host:port", "socks5://host:port")',
     )
     parser.add_argument(
         "--proxy-list",

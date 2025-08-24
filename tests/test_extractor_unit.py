@@ -21,8 +21,8 @@ def test_parse_xml_transcript_text_elements():
     e = YouTubeTranscriptExtractor()
     xml = (
         "<transcript>"
-        "<text start=\"0.0\" dur=\"2.5\">Hello &amp; world</text>"
-        "<text start=\"2.5\" dur=\"2.5\">Again <b>there</b></text>"
+        '<text start="0.0" dur="2.5">Hello &amp; world</text>'
+        '<text start="2.5" dur="2.5">Again <b>there</b></text>'
         "</transcript>"
     )
     segments = e.parse_xml_transcript(xml)
@@ -35,8 +35,8 @@ def test_parse_xml_transcript_p_elements_with_s_children():
     e = YouTubeTranscriptExtractor()
     xml = (
         "<timedtext><body>"
-        "<p t=\"1000\" d=\"2000\"><s>Hi</s><s>there</s></p>"
-        "<p t=\"4000\" d=\"1000\">Single node</p>"
+        '<p t="1000" d="2000"><s>Hi</s><s>there</s></p>'
+        '<p t="4000" d="1000">Single node</p>'
         "</body></timedtext>"
     )
     segments = e.parse_xml_transcript(xml)

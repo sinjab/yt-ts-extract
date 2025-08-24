@@ -31,15 +31,17 @@ def test_cli_text_with_summary_keywords_search(monkeypatch, capsys):
 
     monkeypatch.setattr(YouTubeTranscriptExtractor, "get_transcript", fake_get_transcript)
 
-    run_cli([
-        "--summary",
-        "1",
-        "--keywords",
-        "3",
-        "--search",
-        "beta",
-        "https://youtu.be/vid",
-    ])
+    run_cli(
+        [
+            "--summary",
+            "1",
+            "--keywords",
+            "3",
+            "--search",
+            "beta",
+            "https://youtu.be/vid",
+        ]
+    )
 
     out = capsys.readouterr().out
     assert "--- SUMMARY ---" in out

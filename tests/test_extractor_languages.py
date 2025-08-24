@@ -20,7 +20,7 @@ def test_get_available_languages_stubs_innertube(monkeypatch):
                         {
                             "languageCode": "en",
                             "name": {"simpleText": "English"},
-                            "baseUrl": "http://example/en", 
+                            "baseUrl": "http://example/en",
                         },
                         {
                             "languageCode": "es",
@@ -33,7 +33,9 @@ def test_get_available_languages_stubs_innertube(monkeypatch):
             },
         }
 
-    monkeypatch.setattr(YouTubeTranscriptExtractor, "get_api_key_from_homepage", fake_get_api_key_from_homepage)
+    monkeypatch.setattr(
+        YouTubeTranscriptExtractor, "get_api_key_from_homepage", fake_get_api_key_from_homepage
+    )
     monkeypatch.setattr(YouTubeTranscriptExtractor, "call_innertube_api", fake_call_innertube_api)
 
     langs = e.get_available_languages("dQw4w9WgXcQ")

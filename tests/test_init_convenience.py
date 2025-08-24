@@ -20,9 +20,7 @@ def test_convenience_get_transcript_text(monkeypatch):
     def fake_get_transcript_text(self, url, language="en"):
         return "joined text"
 
-    monkeypatch.setattr(
-        YouTubeTranscriptExtractor, "get_transcript_text", fake_get_transcript_text
-    )
+    monkeypatch.setattr(YouTubeTranscriptExtractor, "get_transcript_text", fake_get_transcript_text)
 
     out = pkg.get_transcript_text("https://youtu.be/vidid", language="en")
     assert out == "joined text"

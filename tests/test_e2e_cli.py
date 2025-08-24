@@ -47,4 +47,6 @@ class TestE2ECLI:
         # Use a common word likely to appear
         self.run_cli(["--search", "never", self.VIDEO_ID])
         out = capsys.readouterr().out.lower()
-        assert "search results" in out and ("never" in out), "Expected search results section with matches"
+        assert "search results" in out and (
+            "never" in out
+        ), "Expected search results section with matches"
