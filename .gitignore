@@ -68,3 +68,6 @@ Thumbs.db
 *.srt
 *.json
 *.txt
+
+# Rules
+.*/rules/
