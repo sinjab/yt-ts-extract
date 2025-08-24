@@ -16,8 +16,12 @@ uv.lock
 .vscode/
 .idea/
 
+# Rules
+.*/rules/
+
 # Python cache
 __pycache__/
+.pytest_cache/
 *.py[cod]
 *$py.class
 *.so
@@ -68,9 +72,6 @@ Thumbs.db
 *.srt
 *.json
 *.txt
-
-# Rules
-.*/rules/
 
 # Coverage
 .coverage
