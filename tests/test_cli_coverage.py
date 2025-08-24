@@ -45,7 +45,9 @@ class TestCLICoverage:
             return fake_languages
 
         monkeypatch.setattr(
-            YouTubeTranscriptExtractor, "get_available_languages", fake_get_available_languages
+            YouTubeTranscriptExtractor,
+            "get_available_languages",
+            fake_get_available_languages,
         )
 
         run_cli(["--list-languages", "test123"])

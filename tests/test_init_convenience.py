@@ -36,7 +36,9 @@ def test_convenience_get_available_languages(monkeypatch):
         return langs
 
     monkeypatch.setattr(
-        YouTubeTranscriptExtractor, "get_available_languages", fake_get_available_languages
+        YouTubeTranscriptExtractor,
+        "get_available_languages",
+        fake_get_available_languages,
     )
 
     out = pkg.get_available_languages("https://youtu.be/vidid")

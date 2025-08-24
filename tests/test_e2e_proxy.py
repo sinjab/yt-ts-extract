@@ -136,8 +136,8 @@ class TestProxyE2E:
         proxy_url = "http://timeout:proxy@timeout-host:8080"
 
         extractor = YouTubeTranscriptExtractor(
-            proxy=proxy_url, timeout=1, max_retries=1  # Very short timeout
-        )
+            proxy=proxy_url, timeout=1, max_retries=1
+        )  # Very short timeout
 
         start_time = time.time()
 
@@ -210,7 +210,13 @@ class TestProxyE2E:
             error_str = str(e).lower()
             assert any(
                 keyword in error_str
-                for keyword in ["proxy", "connection", "timeout", "unreachable", "failed"]
+                for keyword in [
+                    "proxy",
+                    "connection",
+                    "timeout",
+                    "unreachable",
+                    "failed",
+                ]
             )
 
             # Should not crash the application

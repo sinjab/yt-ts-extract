@@ -79,7 +79,11 @@ class TestYouTubeTranscriptExtractorProxy:
         """Test that proxy works with other extractor options"""
         proxy_url = "http://user:pass@host:port"
         extractor = YouTubeTranscriptExtractor(
-            timeout=60, max_retries=5, backoff_factor=1.0, min_delay=3.0, proxy=proxy_url
+            timeout=60,
+            max_retries=5,
+            backoff_factor=1.0,
+            min_delay=3.0,
+            proxy=proxy_url,
         )
 
         # Verify all options are set correctly

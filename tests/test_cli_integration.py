@@ -70,7 +70,9 @@ def test_cli_list_languages(monkeypatch, capsys):
         ]
 
     monkeypatch.setattr(
-        YouTubeTranscriptExtractor, "get_available_languages", fake_get_available_languages
+        YouTubeTranscriptExtractor,
+        "get_available_languages",
+        fake_get_available_languages,
     )
 
     run_cli(["--list-languages", "https://youtu.be/vid"])  # language listing

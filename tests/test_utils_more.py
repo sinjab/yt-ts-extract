@@ -29,7 +29,11 @@ def test_clean_transcript_text_punctuation_spacing():
 
 def test_search_transcript_context_and_multiword():
     transcript = [
-        {"text": "alpha beta gamma delta epsilon zeta eta", "start": 5.0, "duration": 2.0},
+        {
+            "text": "alpha beta gamma delta epsilon zeta eta",
+            "start": 5.0,
+            "duration": 2.0,
+        },
     ]
     matches = utils.search_transcript(transcript, "beta gamma", context_words=2)
     assert matches and "beta" in matches[0]["text"]
@@ -37,7 +41,11 @@ def test_search_transcript_context_and_multiword():
 
 def test_create_summary_with_short_sentences():
     transcript = [
-        {"text": "Hi. Short sentence here. Another one appears.", "start": 0.0, "duration": 3.0}
+        {
+            "text": "Hi. Short sentence here. Another one appears.",
+            "start": 0.0,
+            "duration": 3.0,
+        }
     ]
     summary = utils.create_summary(transcript, max_sentences=1)
     assert isinstance(summary, str) and summary.endswith(".")

@@ -153,7 +153,11 @@ invalid line
 
     def test_proxy_manager_from_list_invalid_url(self):
         """Test creating ProxyManager from list with invalid URLs"""
-        urls = ["http://user1:pass1@192.168.1.1:8080", "invalid-url", "https://192.168.1.2:8443"]
+        urls = [
+            "http://user1:pass1@192.168.1.1:8080",
+            "invalid-url",
+            "https://192.168.1.2:8443",
+        ]
 
         manager = ProxyManager.from_list(urls)
         assert len(manager) == 2  # Invalid URL should be skipped

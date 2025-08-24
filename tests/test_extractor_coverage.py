@@ -326,7 +326,11 @@ class TestExtractorErrorCoverage:
 
                 with patch.object(extractor, "extract_caption_tracks") as mock_tracks:
                     mock_tracks.return_value = [
-                        {"languageCode": "en", "name": "English", "baseUrl": "http://example.com"}
+                        {
+                            "languageCode": "en",
+                            "name": "English",
+                            "baseUrl": "http://example.com",
+                        }
                     ]
 
                     with patch.object(extractor, "_select_best_track") as mock_select:

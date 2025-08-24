@@ -68,7 +68,10 @@ class TestUtilsCoverage:
 
             with patch("builtins.open", mock_open()):
                 with patch("yt_ts_extract.utils.export_to_srt"):
-                    with patch("yt_ts_extract.utils.clean_transcript_text", return_value="Hello"):
+                    with patch(
+                        "yt_ts_extract.utils.clean_transcript_text",
+                        return_value="Hello",
+                    ):
                         result = batch_process_ids(["vid1", "vid2"], str(tmp_path))
 
                         assert result["total_processed"] == 2
@@ -349,7 +352,11 @@ class TestUtilsErrorCoverage:
         """Test summary creation with various punctuation"""
         transcript = [
             {"text": "First sentence! Second sentence?", "start": 0.0, "duration": 1.0},
-            {"text": "Third sentence. Fourth sentence...", "start": 1.0, "duration": 1.0},
+            {
+                "text": "Third sentence. Fourth sentence...",
+                "start": 1.0,
+                "duration": 1.0,
+            },
         ]
 
         summary = create_summary(transcript, max_sentences=2)
