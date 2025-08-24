@@ -34,13 +34,13 @@ pip install -e .
 
 ```bash
 # Basic transcript extraction
-yt-transcript dQw4w9WgXcQ
+yt-transcript fR9ClX0egTc
 
 # Export as SRT subtitles
-yt-transcript -f srt -o video.srt dQw4w9WgXcQ
+yt-transcript -f srt -o video.srt fR9ClX0egTc
 
 # List available languages
-yt-transcript --list-languages dQw4w9WgXcQ
+yt-transcript --list-languages fR9ClX0egTc
 
 # Batch process multiple videos
 yt-transcript --batch ids.txt --output-dir ./transcripts/
@@ -61,7 +61,7 @@ from yt_ts_extract import (
 from yt_ts_extract.utils import export_to_srt, get_transcript_stats
 
 # Quick transcript extraction
-transcript = get_transcript("dQw4w9WgXcQ")
+transcript = get_transcript("fR9ClX0egTc")
 print(f"Segments: {len(transcript)}")
 
 # Export to SRT
@@ -70,8 +70,8 @@ with open("video.srt", "w", encoding="utf-8") as f:
     f.write(srt_text)
 
 # Plain text and languages
-text = get_transcript_text("dQw4w9WgXcQ")
-langs = get_available_languages("dQw4w9WgXcQ")
+text = get_transcript_text("fR9ClX0egTc")
+langs = get_available_languages("fR9ClX0egTc")
 print(f"Languages available: {[l['code'] for l in langs]}")
 
 # Using the class directly
@@ -81,7 +81,7 @@ extractor = YouTubeTranscriptExtractor(
     backoff_factor=1.0,
     min_delay=1.5
 )
-segments = extractor.get_transcript("dQw4w9WgXcQ", language="en")
+segments = extractor.get_transcript("fR9ClX0egTc", language="en")
 stats = get_transcript_stats(segments)
 print(stats)
 ```
@@ -115,16 +115,16 @@ Options:
 
 ```bash
 # Increase retries and timeout
-yt-transcript dQw4w9WgXcQ --retries 5 --timeout 45
+yt-transcript fR9ClX0egTc --retries 5 --timeout 45
 
 # Reduce delay for faster runs (use responsibly)
-yt-transcript dQw4w9WgXcQ --min-delay 1.0 --backoff 0.5
+yt-transcript fR9ClX0egTc --min-delay 1.0 --backoff 0.5
 
 # Single proxy
-yt-transcript dQw4w9WgXcQ --proxy "http://user:pass@host:port"
+yt-transcript fR9ClX0egTc --proxy "http://user:pass@host:port"
 
 # Proxy rotation with health check
-yt-transcript dQw4w9WgXcQ --proxy-list proxies.txt --health-check
+yt-transcript fR9ClX0egTc --proxy-list proxies.txt --health-check
 
 # Batch processing with proxy rotation
 yt-transcript --batch ids.txt --proxy-list proxies.txt --output-dir transcripts/
@@ -136,13 +136,13 @@ yt-transcript --batch ids.txt --proxy-list proxies.txt --output-dir transcripts/
 
 ```bash
 # HTTP proxy with authentication
-yt-transcript --proxy "http://username:password@proxy-host:8080" dQw4w9WgXcQ
+yt-transcript --proxy "http://username:password@proxy-host:8080" fR9ClX0egTc
 
 # HTTPS proxy
-yt-transcript --proxy "https://proxy-host:8443" dQw4w9WgXcQ
+yt-transcript --proxy "https://proxy-host:8443" fR9ClX0egTc
 
 # SOCKS5 proxy
-yt-transcript --proxy "socks5://user:pass@proxy-host:1080" dQw4w9WgXcQ
+yt-transcript --proxy "socks5://user:pass@proxy-host:1080" fR9ClX0egTc
 ```
 
 ### Proxy Rotation
@@ -151,13 +151,13 @@ Load multiple proxies from a file and automatically rotate between them:
 
 ```bash
 # Basic proxy rotation
-yt-transcript --proxy-list proxies.txt dQw4w9WgXcQ
+yt-transcript --proxy-list proxies.txt fR9ClX0egTc
 
 # With rotation strategy
-yt-transcript --proxy-list proxies.txt --rotation-strategy round_robin dQw4w9WgXcQ
+yt-transcript --proxy-list proxies.txt --rotation-strategy round_robin fR9ClX0egTc
 
 # With health check
-yt-transcript --proxy-list proxies.txt --health-check dQw4w9WgXcQ
+yt-transcript --proxy-list proxies.txt --health-check fR9ClX0egTc
 ```
 
 **Proxy List File Format** (`proxies.txt`):
@@ -198,7 +198,7 @@ extractor = YouTubeTranscriptExtractor(
 
 # Convenience functions with proxy rotation
 from yt_ts_extract import get_transcript_with_proxy_rotation
-transcript = get_transcript_with_proxy_rotation("dQw4w9WgXcQ", "proxies.txt")
+transcript = get_transcript_with_proxy_rotation("fR9ClX0egTc", "proxies.txt")
 ```
 
 **Proxy Best Practices:**
@@ -278,7 +278,7 @@ Use `--list-languages` to see available languages for any video.
 
 Create an `ids.txt` file (one video ID per line):
 ```
-dQw4w9WgXcQ
+fR9ClX0egTc
 9bZkp7q19f0
 wIwCTQZ_xFE
 ```
@@ -304,7 +304,7 @@ from yt_ts_extract.utils import get_transcript_stats
 extractor = YouTubeTranscriptExtractor()
 
 # Get timestamped segments for an ID
-segments = extractor.get_transcript("dQw4w9WgXcQ", language="en")
+segments = extractor.get_transcript("fR9ClX0egTc", language="en")
 for seg in segments[:5]:
     print(f"{seg['start']:.1f}s: {seg['text']}")
 

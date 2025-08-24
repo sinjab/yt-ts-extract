@@ -10,7 +10,7 @@ def test_get_available_languages_stubs_innertube(monkeypatch):
         return "FAKE_KEY"
 
     def fake_call_innertube_api(self, video_id, api_key):
-        assert video_id == "dQw4w9WgXcQ"
+        assert video_id == "fR9ClX0egTc"
         assert api_key == "FAKE_KEY"
         return {
             "playabilityStatus": {"status": "OK"},
@@ -38,7 +38,7 @@ def test_get_available_languages_stubs_innertube(monkeypatch):
     )
     monkeypatch.setattr(YouTubeTranscriptExtractor, "call_innertube_api", fake_call_innertube_api)
 
-    langs = e.get_available_languages("dQw4w9WgXcQ")
+    langs = e.get_available_languages("fR9ClX0egTc")
     assert langs == [
         {"code": "en", "name": "English", "auto_generated": False},
         {"code": "es", "name": "Español", "auto_generated": True},

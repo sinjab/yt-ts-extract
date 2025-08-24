@@ -50,7 +50,7 @@ class TestProxyE2E:
 
         # Attempt to make a request (will fail, but proxy should be used)
         try:
-            extractor.get_video_html("dQw4w9WgXcQ")
+            extractor.get_video_html("fR9ClX0egTc")
         except Exception as e:
             # Expected to fail due to unreachable proxy
             assert "proxy" in str(e).lower() or "connection" in str(e).lower()
@@ -85,7 +85,7 @@ class TestProxyE2E:
 
         # Test get_transcript with proxy
         try:
-            transcript = get_transcript("dQw4w9WgXcQ", proxy=proxy_url)
+            transcript = get_transcript("fR9ClX0egTc", proxy=proxy_url)
             # If this succeeds, proxy worked
             assert isinstance(transcript, list)
         except Exception as e:
@@ -123,7 +123,7 @@ class TestProxyE2E:
         # Test batch processing with proxy
         try:
             # This will fail due to unreachable proxy, but proxy should be configured
-            results = batch_process_ids(["dQw4w9WgXcQ"], "test_output", proxy=proxy_url)
+            results = batch_process_ids(["fR9ClX0egTc"], "test_output", proxy=proxy_url)
             # If this succeeds, proxy worked
             assert isinstance(results, dict)
         except Exception as e:
@@ -142,7 +142,7 @@ class TestProxyE2E:
         start_time = time.time()
 
         try:
-            extractor.get_video_html("dQw4w9WgXcQ")
+            extractor.get_video_html("fR9ClX0egTc")
         except Exception as e:
             elapsed = time.time() - start_time
 
@@ -204,7 +204,7 @@ class TestProxyE2E:
 
         # This should fail gracefully with proper error handling
         try:
-            extractor.get_video_html("dQw4w9WgXcQ")
+            extractor.get_video_html("fR9ClX0egTc")
         except Exception as e:
             # Should be a meaningful error message
             error_str = str(e).lower()
@@ -249,8 +249,8 @@ class TestProxyIntegration:
 
         # Test all convenience functions
         functions_to_test = [
-            lambda: get_transcript("dQw4w9WgXcQ", proxy=proxy_url),
-            lambda: get_transcript("dQw4w9WgXcQ", proxy=proxy_url, language="en"),
+            lambda: get_transcript("fR9ClX0egTc", proxy=proxy_url),
+            lambda: get_transcript("fR9ClX0egTc", proxy=proxy_url, language="en"),
         ]
 
         for func in functions_to_test:

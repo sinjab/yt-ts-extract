@@ -107,7 +107,7 @@ class TestProxyIntegration:
         extractor = YouTubeTranscriptExtractor(proxy=proxy_url)
 
         # Make a request
-        extractor.get_video_html("dQw4w9WgXcQ")
+        extractor.get_video_html("fR9ClX0egTc")
 
         # Verify the request was made with the session (which has proxy configured)
         mock_get.assert_called_once()

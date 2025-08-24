@@ -33,13 +33,13 @@ class YouTubeTranscriptExtractor:
 
     Example:
         extractor = YouTubeTranscriptExtractor()
-        transcript = extractor.get_transcript("dQw4w9WgXcQ")
+        transcript = extractor.get_transcript("fR9ClX0egTc")
 
         # Get as plain text
-        text = extractor.get_transcript_text("dQw4w9WgXcQ")
+        text = extractor.get_transcript_text("fR9ClX0egTc")
 
         # Check available languages
-        languages = extractor.get_available_languages("dQw4w9WgXcQ")
+        languages = extractor.get_available_languages("fR9ClX0egTc")
     """
 
     def __init__(
@@ -461,7 +461,7 @@ class YouTubeTranscriptExtractor:
 
         Example:
             extractor = YouTubeTranscriptExtractor()
-            languages = extractor.get_available_languages("dQw4w9WgXcQ")
+            languages = extractor.get_available_languages("fR9ClX0egTc")
             for lang in languages:
                 print(f"{lang['name']} ({lang['code']}) - {'Auto' if lang['auto_generated'] else 'Manual'}")
         """
@@ -508,7 +508,7 @@ class YouTubeTranscriptExtractor:
 
         Example:
             extractor = YouTubeTranscriptExtractor()
-            transcript = extractor.get_transcript("dQw4w9WgXcQ", language='en')
+            transcript = extractor.get_transcript("fR9ClX0egTc", language='en')
             for segment in transcript[:5]:  # First 5 segments
                 print(f"[{segment['start']:.1f}s] {segment['text']}")
         """

@@ -145,7 +145,7 @@ class TestUtilsCoverage:
             out = capsys.readouterr().out
 
             assert "YouTube Transcript Utilities - Demo" in out
-            assert "Testing with video ID: dQw4w9WgXcQ" in out
+            assert "Testing with video ID: fR9ClX0egTc" in out
             assert "1. Transcript Stats:" in out
             assert "2. Top Keywords:" in out
             assert "3. Sample SRT Export:" in out

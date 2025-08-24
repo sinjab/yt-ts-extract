@@ -26,7 +26,7 @@ def export_to_srt(transcript: List[Dict], filename: str = "transcript.srt") -> s
         from yt_ts_extract import get_transcript
         from yt_ts_extract.utils import export_to_srt
 
-        transcript = get_transcript("dQw4w9WgXcQ")
+        transcript = get_transcript("fR9ClX0egTc")
         srt_content = export_to_srt(transcript, "video_subtitles.srt")
     """
 
@@ -79,7 +79,7 @@ def clean_transcript_text(text: str) -> str:
         from yt_ts_extract import get_transcript_text
         from yt_ts_extract.utils import clean_transcript_text
 
-        raw_text = get_transcript_text("dQw4w9WgXcQ")
+        raw_text = get_transcript_text("fR9ClX0egTc")
         clean_text = clean_transcript_text(raw_text)
     """
     # Remove excessive whitespace
@@ -117,7 +117,7 @@ def extract_keywords(transcript: List[Dict], top_n: int = 20) -> List[tuple]:
         from yt_ts_extract import get_transcript
         from yt_ts_extract.utils import extract_keywords
 
-        transcript = get_transcript("dQw4w9WgXcQ")
+        transcript = get_transcript("fR9ClX0egTc")
         keywords = extract_keywords(transcript, 15)
         for word, count in keywords:
             print(f"{word}: {count}")
@@ -270,7 +270,7 @@ def search_transcript(transcript: List[Dict], query: str, context_words: int = 5
         from yt_ts_extract import get_transcript
         from yt_ts_extract.utils import search_transcript
 
-        transcript = get_transcript("dQw4w9WgXcQ")
+        transcript = get_transcript("fR9ClX0egTc")
         matches = search_transcript(transcript, "artificial intelligence", context_words=10)
         for match in matches:
             print(f"[{match['timestamp']}] {match['text']}")
@@ -332,7 +332,7 @@ def create_summary(transcript: List[Dict], max_sentences: int = 5) -> str:
         from yt_ts_extract import get_transcript
         from yt_ts_extract.utils import create_summary
 
-        transcript = get_transcript("dQw4w9WgXcQ")
+        transcript = get_transcript("fR9ClX0egTc")
         summary = create_summary(transcript, max_sentences=3)
         print("Summary:", summary)
     """
@@ -380,7 +380,7 @@ def get_transcript_stats(transcript: List[Dict]) -> Dict:
         from yt_ts_extract import get_transcript
         from yt_ts_extract.utils import get_transcript_stats
 
-        transcript = get_transcript("dQw4w9WgXcQ")
+        transcript = get_transcript("fR9ClX0egTc")
         stats = get_transcript_stats(transcript)
         print(f"Duration: {stats['duration_formatted']}")
         print(f"Word count: {stats['word_count']}")
@@ -445,7 +445,7 @@ def batch_process_ids(
         from yt_ts_extract.utils import batch_process_ids
 
         ids = [
-            "dQw4w9WgXcQ",
+            "fR9ClX0egTc",
             "9bZkp7q19f0"
         ]
         results = batch_process_ids(ids, "my_transcripts/", proxy="http://user:pass@host:port")
@@ -532,7 +532,7 @@ def demo_utilities():
     print("=" * 50)
 
     extractor = YouTubeTranscriptExtractor()
-    test_id = "dQw4w9WgXcQ"
+    test_id = "fR9ClX0egTc"
 
     try:
         print(f"Testing with video ID: {test_id}")

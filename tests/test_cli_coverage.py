@@ -31,7 +31,7 @@ class TestCLICoverage:
 
         assert "YouTube Transcript Extractor - CLI Examples" in out
         assert "Basic text extraction" in out
-        assert "yt-transcript dQw4w9WgXcQ" in out
+        assert "yt-transcript fR9ClX0egTc" in out
         assert "Create a file 'ids.txt'" in out
 
     def test_cli_list_languages(self, monkeypatch, capsys):
@@ -294,7 +294,7 @@ class TestCLIFunctionCoverage:
 
         assert "YouTube Transcript Extractor - CLI Examples" in out
         assert "Basic text extraction" in out
-        assert "yt-transcript dQw4w9WgXcQ" in out
+        assert "yt-transcript fR9ClX0egTc" in out
 
     def test_handle_batch_processing_function(self, tmp_path, capsys, monkeypatch):
         """Test handle_batch_processing function directly"""

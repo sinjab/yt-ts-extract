@@ -63,8 +63,8 @@ def get_transcript(
         List of transcript segments
 
     Example:
-        transcript = get_transcript("dQw4w9WgXcQ")
-        transcript = get_transcript("dQw4w9WgXcQ", proxy="http://user:pass@host:port")
+        transcript = get_transcript("fR9ClX0egTc")
+        transcript = get_transcript("fR9ClX0egTc", proxy="http://user:pass@host:port")
     """
     extractor = YouTubeTranscriptExtractor(proxy=proxy, **extractor_options)
     return extractor.get_transcript(video_id, language)
@@ -88,8 +88,8 @@ def get_transcript_text(
         Transcript as a single string
 
     Example:
-        text = get_transcript_text("dQw4w9WgXcQ")
-        text = get_transcript_text("dQw4w9WgXcQ", proxy="http://user:pass@host:port")
+        text = get_transcript_text("fR9ClX0egTc")
+        text = get_transcript_text("fR9ClX0egTc", proxy="http://user:pass@host:port")
     """
     extractor = YouTubeTranscriptExtractor(proxy=proxy, **extractor_options)
     return extractor.get_transcript_text(video_id, language)
@@ -109,11 +109,11 @@ def get_available_languages(
         List of available language dictionaries
 
     Example:
-        languages = get_available_languages("dQw4w9WgXcQ")
+        languages = get_available_languages("fR9ClX0egTc")
         for lang in languages:
             print(f"{lang['name']} ({lang['code']})")
 
-        languages = get_available_languages("dQw4w9WgXcQ", proxy="http://user:pass@host:port")
+        languages = get_available_languages("fR9ClX0egTc", proxy="http://user:pass@host:port")
     """
     extractor = YouTubeTranscriptExtractor(proxy=proxy, **extractor_options)
     return extractor.get_available_languages(video_id)
@@ -139,8 +139,8 @@ def get_transcript_with_proxy_rotation(
         List of transcript segments
 
     Example:
-        transcript = get_transcript_with_proxy_rotation("dQw4w9WgXcQ", "proxies.txt")
-        transcript = get_transcript_with_proxy_rotation("dQw4w9WgXcQ", "proxies.txt", rotation_strategy="round_robin")
+        transcript = get_transcript_with_proxy_rotation("fR9ClX0egTc", "proxies.txt")
+        transcript = get_transcript_with_proxy_rotation("fR9ClX0egTc", "proxies.txt", rotation_strategy="round_robin")
     """
     proxy_manager = ProxyManager.from_file(proxy_list_file, rotation_strategy=rotation_strategy)
     extractor = YouTubeTranscriptExtractor(proxy_manager=proxy_manager, **extractor_options)
@@ -167,8 +167,8 @@ def get_transcript_text_with_proxy_rotation(
         Transcript as a single string
 
     Example:
-        text = get_transcript_text_with_proxy_rotation("dQw4w9WgXcQ", "proxies.txt")
-        text = get_transcript_text_with_proxy_rotation("dQw4w9WgXcQ", "proxies.txt", rotation_strategy="round_robin")
+        text = get_transcript_text_with_proxy_rotation("fR9ClX0egTc", "proxies.txt")
+        text = get_transcript_text_with_proxy_rotation("fR9ClX0egTc", "proxies.txt", rotation_strategy="round_robin")
     """
     proxy_manager = ProxyManager.from_file(proxy_list_file, rotation_strategy=rotation_strategy)
     extractor = YouTubeTranscriptExtractor(proxy_manager=proxy_manager, **extractor_options)

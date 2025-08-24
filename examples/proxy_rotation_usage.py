@@ -30,7 +30,7 @@ def basic_proxy_rotation():
 
     # Extract transcript (proxies will rotate automatically on failures)
     try:
-        transcript = extractor.get_transcript("dQw4w9WgXcQ")
+        transcript = extractor.get_transcript("fR9ClX0egTc")
         print(f"Successfully extracted transcript with {len(transcript)} segments")
 
         # Show final proxy stats
@@ -58,7 +58,7 @@ def proxy_rotation_with_strategies():
 
             # Use convenience function
             transcript = get_transcript_with_proxy_rotation(
-                "dQw4w9WgXcQ", "proxies.txt", rotation_strategy=strategy
+                "fR9ClX0egTc", "proxies.txt", rotation_strategy=strategy
             )
 
             print(f"  ✅ Success with {strategy}: {len(transcript)} segments")
@@ -124,7 +124,7 @@ def proxy_rotation_with_custom_settings():
             proxy_manager=proxy_manager, timeout=45, max_retries=5
         )
 
-        transcript = extractor.get_transcript("dQw4w9WgXcQ")
+        transcript = extractor.get_transcript("fR9ClX0egTc")
         print(f"Successfully extracted transcript: {len(transcript)} segments")
 
     except Exception as e:
@@ -143,7 +143,7 @@ def batch_processing_with_proxy_rotation():
 
         # Sample video IDs
         video_ids = [
-            "dQw4w9WgXcQ",  # Rick Roll
+            "fR9ClX0egTc",  # Rick Roll
             "9bZkp7q19f0",  # Gangnam Style
             "kJQP7kiw5Fk",  # Despacito
         ]
@@ -189,7 +189,7 @@ def proxy_rotation_from_url_list():
 
         # Test extraction
         transcript = get_transcript_text_with_proxy_rotation(
-            "dQw4w9WgXcQ",
+            "fR9ClX0egTc",
             proxy_urls,  # This won't work with the current implementation
             rotation_strategy="least_used",
         )

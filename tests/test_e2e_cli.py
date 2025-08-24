@@ -6,7 +6,7 @@ from yt_ts_extract.cli import main
 
 @pytest.mark.e2e
 class TestE2ECLI:
-    VIDEO_ID = "dQw4w9WgXcQ"  # Popular video with known captions
+    VIDEO_ID = "fR9ClX0egTc"  # Popular video with known captions
 
     def run_cli(self, argv):
         old_argv = sys.argv

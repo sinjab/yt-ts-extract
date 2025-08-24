@@ -27,16 +27,16 @@ def main():
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
-  %(prog)s dQw4w9WgXcQ
-  %(prog)s -f srt -o subtitles.srt dQw4w9WgXcQ
-  %(prog)s -f stats --keywords 10 dQw4w9WgXcQ
-  %(prog)s --search "artificial intelligence" dQw4w9WgXcQ
+  %(prog)s fR9ClX0egTc
+  %(prog)s -f srt -o subtitles.srt fR9ClX0egTc
+  %(prog)s -f stats --keywords 10 fR9ClX0egTc
+  %(prog)s --search "artificial intelligence" fR9ClX0egTc
   %(prog)s --batch ids.txt --output-dir transcripts/
   
 🔒 Proxy Examples:
-  %(prog)s --proxy "http://user:pass@host:port" dQw4w9WgXcQ
-  %(prog)s --proxy "https://host:port" --timeout 60 dQw4w9WgXcQ
-  %(prog)s --proxy "socks5://host:port" --retries 5 dQw4w9WgXcQ
+  %(prog)s --proxy "http://user:pass@host:port" fR9ClX0egTc
+  %(prog)s --proxy "https://host:port" --timeout 60 fR9ClX0egTc
+  %(prog)s --proxy "socks5://host:port" --retries 5 fR9ClX0egTc
   %(prog)s --batch ids.txt --proxy "http://host:port" --output-dir transcripts/
         """,
     )
@@ -338,47 +338,47 @@ def run_examples():
     print("=" * 50)
 
     examples = [
-        ("Basic text extraction", "yt-transcript dQw4w9WgXcQ"),
-        ("Save as SRT file", "yt-transcript -f srt -o video.srt dQw4w9WgXcQ"),
-        ("Get transcript stats", "yt-transcript -f stats dQw4w9WgXcQ"),
-        ("Extract with summary", "yt-transcript --summary 3 dQw4w9WgXcQ"),
-        ("Get top keywords", "yt-transcript --keywords 10 dQw4w9WgXcQ"),
-        ("Search transcript", 'yt-transcript --search "keyword" dQw4w9WgXcQ'),
+        ("Basic text extraction", "yt-transcript fR9ClX0egTc"),
+        ("Save as SRT file", "yt-transcript -f srt -o video.srt fR9ClX0egTc"),
+        ("Get transcript stats", "yt-transcript -f stats fR9ClX0egTc"),
+        ("Extract with summary", "yt-transcript --summary 3 fR9ClX0egTc"),
+        ("Get top keywords", "yt-transcript --keywords 10 fR9ClX0egTc"),
+        ("Search transcript", 'yt-transcript --search "keyword" fR9ClX0egTc'),
         (
             "Clean text output",
-            "yt-transcript --clean -o clean.txt dQw4w9WgXcQ",
+            "yt-transcript --clean -o clean.txt fR9ClX0egTc",
         ),
-        ("List languages", "yt-transcript --list-languages dQw4w9WgXcQ"),
+        ("List languages", "yt-transcript --list-languages fR9ClX0egTc"),
         (
             "Batch processing",
             "yt-transcript --batch ids.txt --output-dir transcripts/",
         ),
-        ("Timestamped segments", "yt-transcript -f segments dQw4w9WgXcQ"),
+        ("Timestamped segments", "yt-transcript -f segments fR9ClX0egTc"),
         ("", ""),  # Empty line for separation
         ("🔒 PROXY EXAMPLES:", ""),
         (
             "HTTP proxy with auth",
-            'yt-transcript --proxy "http://user:pass@host:port" dQw4w9WgXcQ',
+            'yt-transcript --proxy "http://user:pass@host:port" fR9ClX0egTc',
         ),
         (
             "HTTP proxy without auth",
-            'yt-transcript --proxy "http://host:port" dQw4w9WgXcQ',
+            'yt-transcript --proxy "http://host:port" fR9ClX0egTc',
         ),
         (
             "HTTPS proxy",
-            'yt-transcript --proxy "https://secure-host:8443" dQw4w9WgXcQ',
+            'yt-transcript --proxy "https://secure-host:8443" fR9ClX0egTc',
         ),
         (
             "SOCKS5 proxy",
-            'yt-transcript --proxy "socks5://user:pass@host:1080" dQw4w9WgXcQ',
+            'yt-transcript --proxy "socks5://user:pass@host:1080" fR9ClX0egTc',
         ),
         (
             "Proxy with custom timeout",
-            'yt-transcript --proxy "http://host:port" --timeout 60 dQw4w9WgXcQ',
+            'yt-transcript --proxy "http://host:port" --timeout 60 fR9ClX0egTc',
         ),
         (
             "Proxy with retries",
-            'yt-transcript --proxy "http://host:port" --retries 5 dQw4w9WgXcQ',
+            'yt-transcript --proxy "http://host:port" --retries 5 fR9ClX0egTc',
         ),
         (
             "Batch processing with proxy",
@@ -386,21 +386,21 @@ def run_examples():
         ),
         (
             "Proxy with all options",
-            'yt-transcript --proxy "http://user:pass@host:port" --timeout 60 --retries 5 --min-delay 1.0 dQw4w9WgXcQ',
+            'yt-transcript --proxy "http://user:pass@host:port" --timeout 60 --retries 5 --min-delay 1.0 fR9ClX0egTc',
         ),
         ("", ""),  # Empty line for separation
         ("🔄 PROXY ROTATION EXAMPLES:", ""),
         (
             "Proxy list file",
-            "yt-transcript --proxy-list proxies.txt dQw4w9WgXcQ",
+            "yt-transcript --proxy-list proxies.txt fR9ClX0egTc",
         ),
         (
             "Proxy rotation with strategy",
-            "yt-transcript --proxy-list proxies.txt --rotation-strategy round_robin dQw4w9WgXcQ",
+            "yt-transcript --proxy-list proxies.txt --rotation-strategy round_robin fR9ClX0egTc",
         ),
         (
             "Proxy rotation with health check",
-            "yt-transcript --proxy-list proxies.txt --health-check dQw4w9WgXcQ",
+            "yt-transcript --proxy-list proxies.txt --health-check fR9ClX0egTc",
         ),
         (
             "Batch with proxy rotation",
@@ -420,7 +420,7 @@ def run_examples():
     print(f"\n{'=' * 50}")
     print("Create a file 'ids.txt' with YouTube video IDs (one per line) for batch processing.")
     print("Example ids.txt content:")
-    print("  dQw4w9WgXcQ")
+    print("  fR9ClX0egTc")
     print("  9bZkp7q19f0")
     print("  # This is a comment - lines starting with # are ignored")
     print(f"\n{'=' * 50}")

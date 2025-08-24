@@ -68,7 +68,7 @@ def demonstrate_proxy_usage():
 
     try:
         # This won't actually make a request since we're using a fake proxy
-        transcript = get_transcript("dQw4w9WgXcQ", proxy="http://fake-proxy:8080")
+        transcript = get_transcript("fR9ClX0egTc", proxy="http://fake-proxy:8080")
         print("   ✅ Convenience function configured with proxy")
     except Exception as e:
         print(f"   ❌ Error (expected with fake proxy): {e}")
@@ -82,7 +82,7 @@ def demonstrate_proxy_usage():
 
         # This would process multiple videos through the proxy
         # results = batch_process_ids(
-        #     ["dQw4w9WgXcQ", "9bZkp7q19f0"],
+        #     ["fR9ClX0egTc", "9bZkp7q19f0"],
         #     "transcripts/",
         #     proxy="http://proxy-host:8080"
         # )
