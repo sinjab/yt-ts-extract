@@ -9,7 +9,6 @@ import re
 from typing import List, Dict, Optional
 from collections import Counter
 from datetime import datetime
-from main import YouTubeTranscriptExtractor
 
 
 def export_to_srt(transcript: List[Dict], filename: str = "transcript.srt") -> str:
@@ -24,7 +23,10 @@ def export_to_srt(transcript: List[Dict], filename: str = "transcript.srt") -> s
         SRT formatted string
     
     Example:
-        transcript = extractor.get_transcript("https://youtube.com/watch?v=...")
+        from yt_ts_extract import get_transcript
+        from yt_ts_extract.utils import export_to_srt
+        
+        transcript = get_transcript("https://youtube.com/watch?v=...")
         srt_content = export_to_srt(transcript, "video_subtitles.srt")
     """
     def format_srt_timestamp(seconds: float) -> str:
@@ -73,7 +75,10 @@ def clean_transcript_text(text: str) -> str:
         Cleaned text
     
     Example:
-        raw_text = extractor.get_transcript_text("https://youtube.com/watch?v=...")
+        from yt_ts_extract import get_transcript_text
+        from yt_ts_extract.utils import clean_transcript_text
+        
+        raw_text = get_transcript_text("https://youtube.com/watch?v=...")
         clean_text = clean_transcript_text(raw_text)
     """
     # Remove excessive whitespace
@@ -85,8 +90,8 @@ def clean_transcript_text(text: str) -> str:
     text = re.sub(r'\[Laughter\]', '', text, flags=re.IGNORECASE)
     
     # Fix common punctuation issues
-    text = re.sub(r'\s+([.!?])', r'\1', text)  # Remove space before punctuation
-    text = re.sub(r'([.!?])\s*([a-z])', r'\1 \2', text)  # Add space after punctuation
+    text = re.sub(r'\s+([.!?])', r'\\1', text)  # Remove space before punctuation
+    text = re.sub(r'([.!?])\\s*([a-z])', r'\\1 \\2', text)  # Add space after punctuation
     
     # Capitalize sentences
     sentences = text.split('. ')
@@ -108,7 +113,10 @@ def extract_keywords(transcript: List[Dict], top_n: int = 20) -> List[tuple]:
         List of tuples (word, count) sorted by frequency
     
     Example:
-        transcript = extractor.get_transcript("https://youtube.com/watch?v=...")
+        from yt_ts_extract import get_transcript
+        from yt_ts_extract.utils import extract_keywords
+        
+        transcript = get_transcript("https://youtube.com/watch?v=...")
         keywords = extract_keywords(transcript, 15)
         for word, count in keywords:
             print(f"{word}: {count}")
@@ -118,7 +126,7 @@ def extract_keywords(transcript: List[Dict], top_n: int = 20) -> List[tuple]:
     
     # Clean and normalize text
     text = full_text.lower()
-    text = re.sub(r'[^a-zA-Z\s]', '', text)  # Remove non-alphabetic characters
+    text = re.sub(r'[^a-zA-Z\\s]', '', text)  # Remove non-alphabetic characters
     
     # Common stop words to filter out
     stop_words = {
@@ -156,11 +164,16 @@ def search_transcript(transcript: List[Dict], query: str, context_words: int = 5
         List of matches with context and timestamps
     
     Example:
-        transcript = extractor.get_transcript("https://youtube.com/watch?v=...")
+        from yt_ts_extract import get_transcript
+        from yt_ts_extract.utils import search_transcript
+        
+        transcript = get_transcript("https://youtube.com/watch?v=...")
         matches = search_transcript(transcript, "artificial intelligence", context_words=10)
         for match in matches:
             print(f"[{match['timestamp']}] {match['text']}")
     """
+    from .extractor import YouTubeTranscriptExtractor
+    
     matches = []
     query_lower = query.lower()
     
@@ -211,7 +224,10 @@ def create_summary(transcript: List[Dict], max_sentences: int = 5) -> str:
         Summary text
     
     Example:
-        transcript = extractor.get_transcript("https://youtube.com/watch?v=...")
+        from yt_ts_extract import get_transcript
+        from yt_ts_extract.utils import create_summary
+        
+        transcript = get_transcript("https://youtube.com/watch?v=...")
         summary = create_summary(transcript, max_sentences=3)
         print("Summary:", summary)
     """
@@ -256,11 +272,16 @@ def get_transcript_stats(transcript: List[Dict]) -> Dict:
         Dictionary with various statistics
     
     Example:
-        transcript = extractor.get_transcript("https://youtube.com/watch?v=...")
+        from yt_ts_extract import get_transcript
+        from yt_ts_extract.utils import get_transcript_stats
+        
+        transcript = get_transcript("https://youtube.com/watch?v=...")
         stats = get_transcript_stats(transcript)
         print(f"Duration: {stats['duration_formatted']}")
         print(f"Word count: {stats['word_count']}")
     """
+    from .extractor import YouTubeTranscriptExtractor
+    
     if not transcript:
         return {}
     
@@ -309,12 +330,16 @@ def batch_process_urls(urls: List[str], output_dir: str = "transcripts/") -> Dic
         Processing results summary
     
     Example:
+        from yt_ts_extract.utils import batch_process_urls
+        
         urls = [
             "https://youtube.com/watch?v=video1",
             "https://youtube.com/watch?v=video2"
         ]
         results = batch_process_urls(urls, "my_transcripts/")
     """
+    from .extractor import YouTubeTranscriptExtractor
+    
     extractor = YouTubeTranscriptExtractor()
     results = {
         'successful': [],
@@ -343,7 +368,7 @@ def batch_process_urls(urls: List[str], output_dir: str = "transcripts/") -> Dic
             with open(f"{base_filename}_segments.txt", 'w', encoding='utf-8') as f:
                 for segment in transcript:
                     timestamp = extractor._format_timestamp(segment['start'])
-                    f.write(f"[{timestamp}] {segment['text']}\n")
+                    f.write(f"[{timestamp}] {segment['text']}\\n")
             
             # Save as plain text
             plain_text = extractor.get_transcript_text(url)
@@ -379,7 +404,7 @@ def batch_process_urls(urls: List[str], output_dir: str = "transcripts/") -> Dic
     results['duration'] = results['end_time'] - results['start_time']
     
     # Print summary
-    print(f"\nBatch processing completed!")
+    print(f"\\nBatch processing completed!")
     print(f"Successful: {len(results['successful'])}")
     print(f"Failed: {len(results['failed'])}")
     print(f"Total time: {results['duration']}")
@@ -389,6 +414,8 @@ def batch_process_urls(urls: List[str], output_dir: str = "transcripts/") -> Dic
 
 def demo_utilities():
     """Demonstrate all utility functions"""
+    from .extractor import YouTubeTranscriptExtractor
+    
     print("YouTube Transcript Utilities - Demo")
     print("=" * 50)
     
@@ -399,21 +426,21 @@ def demo_utilities():
         print(f"Testing with URL: {test_url}")
         transcript = extractor.get_transcript(test_url)
         
-        print("\n1. Transcript Stats:")
+        print("\\n1. Transcript Stats:")
         stats = get_transcript_stats(transcript)
         for key, value in stats.items():
             print(f"   {key}: {value}")
         
-        print("\n2. Top Keywords:")
+        print("\\n2. Top Keywords:")
         keywords = extract_keywords(transcript, 10)
         for word, count in keywords[:5]:
             print(f"   {word}: {count}")
         
-        print("\n3. Sample SRT Export:")
+        print("\\n3. Sample SRT Export:")
         srt_content = export_to_srt(transcript[:3], filename=None)  # Just first 3 segments
-        print("   " + srt_content.replace('\n', '\n   ')[:200] + "...")
+        print("   " + srt_content.replace('\\n', '\\n   ')[:200] + "...")
         
-        print("\n4. Search Example:")
+        print("\\n4. Search Example:")
         # This would work if the transcript contained the search term
         matches = search_transcript(transcript, "never", context_words=3)
         if matches:
@@ -422,7 +449,7 @@ def demo_utilities():
         else:
             print("   No matches found for 'never'")
         
-        print("\n5. Summary:")
+        print("\\n5. Summary:")
         summary = create_summary(transcript, max_sentences=2)
         print(f"   {summary[:200]}...")
         
@@ -430,7 +457,7 @@ def demo_utilities():
         print(f"Demo encountered expected error: {e}")
         print("This is normal due to YouTube's anti-bot protection.")
     
-    print(f"\n{'='*50}")
+    print(f"\\n{'='*50}")
     print("All utility functions are ready to use!")
 
 

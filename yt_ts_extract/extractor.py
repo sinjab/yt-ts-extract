@@ -23,9 +23,27 @@ class YouTubeTranscriptExtractor:
     """
     YouTube transcript extractor using the Innertube API approach.
     Handles 2024-2025 anti-bot systems with proper headers and rate limiting.
+    
+    Features:
+    - Extract transcripts from YouTube videos via URL
+    - Support for 26+ languages
+    - Multiple output formats
+    - Robust anti-bot protection bypass
+    - Rate limiting to prevent IP blocking
+    
+    Example:
+        extractor = YouTubeTranscriptExtractor()
+        transcript = extractor.get_transcript("https://www.youtube.com/watch?v=dQw4w9WgXcQ")
+        
+        # Get as plain text
+        text = extractor.get_transcript_text("https://www.youtube.com/watch?v=dQw4w9WgXcQ")
+        
+        # Check available languages
+        languages = extractor.get_available_languages("https://www.youtube.com/watch?v=dQw4w9WgXcQ")
     """
     
     def __init__(self):
+        """Initialize the extractor with session and headers."""
         self.session = requests.Session()
         self.last_request_time = 0
         self.min_delay = 2  # Minimum seconds between requests
@@ -57,7 +75,23 @@ class YouTubeTranscriptExtractor:
         self.last_request_time = time.time()
     
     def extract_video_id(self, url: str) -> str:
-        """Extract video ID from various YouTube URL formats"""
+        """
+        Extract video ID from various YouTube URL formats.
+        
+        Args:
+            url: YouTube video URL in various formats
+            
+        Returns:
+            11-character YouTube video ID
+            
+        Raises:
+            ValueError: If URL format is invalid
+            
+        Example:
+            extractor = YouTubeTranscriptExtractor()
+            video_id = extractor.extract_video_id("https://www.youtube.com/watch?v=dQw4w9WgXcQ")
+            # Returns: "dQw4w9WgXcQ"
+        """
         patterns = [
             r'(?:v=|/)([0-9A-Za-z_-]{11}).*',
             r'youtu\.be/([0-9A-Za-z_-]{11})',
@@ -96,7 +130,19 @@ class YouTubeTranscriptExtractor:
         return "AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8"
     
     def call_innertube_api(self, video_id: str, api_key: str) -> dict:
-        """Call YouTube's Innertube API using Android client"""
+        """
+        Call YouTube's Innertube API using Android client.
+        
+        Args:
+            video_id: YouTube video ID
+            api_key: YouTube API key
+            
+        Returns:
+            Innertube API response data
+            
+        Raises:
+            Exception: If API call fails or returns invalid data
+        """
         self._wait_if_needed()
         
         url = f"https://www.youtube.com/youtubei/v1/player?key={api_key}"
@@ -144,8 +190,18 @@ class YouTubeTranscriptExtractor:
             raise Exception(f"Failed to call Innertube API: {e}")
     
     def extract_caption_tracks(self, innertube_data: dict) -> List[Dict]:
-        """Extract caption track URLs from Innertube response"""
-        # Verify video is playable
+        """
+        Extract caption track URLs from Innertube response.
+        
+        Args:
+            innertube_data: Response data from Innertube API
+            
+        Returns:
+            List of caption track dictionaries
+            
+        Raises:
+            Exception: If video is unplayable or no transcripts available
+        """        # Verify video is playable
         status = innertube_data.get("playabilityStatus", {}).get("status")
         if status == "LOGIN_REQUIRED":
             raise Exception("Video requires login (age restricted)")
@@ -179,7 +235,18 @@ class YouTubeTranscriptExtractor:
         return tracks
     
     def fetch_transcript_xml(self, url: str) -> str:
-        """Fetch transcript XML from timedtext URL"""
+        """
+        Fetch transcript XML from timedtext URL.
+        
+        Args:
+            url: Timedtext XML URL
+            
+        Returns:
+            Raw XML content as string
+            
+        Raises:
+            Exception: If fetch fails
+        """
         self._wait_if_needed()
         
         logger.debug(f"Fetching transcript XML from: {url[:100]}...")
@@ -191,7 +258,18 @@ class YouTubeTranscriptExtractor:
             raise Exception(f"Failed to fetch transcript XML: {e}")
     
     def parse_xml_transcript(self, xml_content: str) -> List[Dict]:
-        """Parse XML transcript into structured data"""
+        """
+        Parse XML transcript into structured data.
+        
+        Args:
+            xml_content: Raw XML transcript content
+            
+        Returns:
+            List of transcript segments with text, start, duration, and end times
+            
+        Raises:
+            Exception: If XML parsing fails
+        """
         try:
             root = ET.fromstring(xml_content)
         except ET.ParseError as e:
@@ -211,8 +289,7 @@ class YouTubeTranscriptExtractor:
                 # Clean text
                 text = unescape(text).strip()
                 text = re.sub(r'<[^>]+>', '', text)  # Remove HTML tags
-                text = re.sub(r'\s+', ' ', text)    # Normalize whitespace
-                
+                text = re.sub(r'\s+', ' ', text)    # Normalize whitespace                
                 if text:
                     segments.append({
                         'text': text,
@@ -250,8 +327,7 @@ class YouTubeTranscriptExtractor:
                             if child.text:
                                 text_parts.append(child.text.strip())
                             if child.tail:
-                                text_parts.append(child.tail.strip())
-                    
+                                text_parts.append(child.tail.strip())                    
                     # Join and clean text
                     text = ' '.join(text_parts).strip()
                     text = unescape(text)
@@ -270,12 +346,26 @@ class YouTubeTranscriptExtractor:
         return segments
     
     def get_available_languages(self, video_url: str) -> List[Dict]:
-        """Get list of available transcript languages for a video"""
+        """
+        Get list of available transcript languages for a video.
+        
+        Args:
+            video_url: YouTube video URL
+            
+        Returns:
+            List of dictionaries containing language information:
+            [{'code': 'en', 'name': 'English', 'auto_generated': False}, ...]
+            
+        Example:
+            extractor = YouTubeTranscriptExtractor()
+            languages = extractor.get_available_languages("https://www.youtube.com/watch?v=dQw4w9WgXcQ")
+            for lang in languages:
+                print(f"{lang['name']} ({lang['code']}) - {'Auto' if lang['auto_generated'] else 'Manual'}")
+        """
         video_id = self.extract_video_id(video_url)
         api_key = self.get_api_key_from_homepage()
         data = self.call_innertube_api(video_id, api_key)
-        tracks = self.extract_caption_tracks(data)
-        
+        tracks = self.extract_caption_tracks(data)        
         languages = []
         for track in tracks:
             # Extract name from the correct structure
@@ -297,7 +387,7 @@ class YouTubeTranscriptExtractor:
     def get_transcript(self, video_url: str, language: str = 'en', 
                       prefer_manual: bool = True) -> List[Dict]:
         """
-        Main method to extract transcript
+        Main method to extract transcript.
         
         Args:
             video_url: YouTube video URL
@@ -305,13 +395,22 @@ class YouTubeTranscriptExtractor:
             prefer_manual: Prefer manual transcripts over auto-generated
         
         Returns:
-            List of transcript segments with text, start, duration, and end times
+            List of transcript segments with text, start, duration, and end times.
+            Each segment is a dictionary: {'text': str, 'start': float, 'duration': float, 'end': float}
+        
+        Raises:
+            Exception: If extraction fails or no transcript available
+            
+        Example:
+            extractor = YouTubeTranscriptExtractor()
+            transcript = extractor.get_transcript("https://www.youtube.com/watch?v=dQw4w9WgXcQ", language='en')
+            for segment in transcript[:5]:  # First 5 segments
+                print(f"[{segment['start']:.1f}s] {segment['text']}")
         """
         video_id = self.extract_video_id(video_url)
         logger.info(f"Extracting transcript for video: {video_id}")
         
-        try:
-            # Step 1: Get API key from homepage (more reliable)
+        try:            # Step 1: Get API key from homepage (more reliable)
             api_key = self.get_api_key_from_homepage()
             
             # Step 2: Call Innertube API with Android client
@@ -349,7 +448,7 @@ class YouTubeTranscriptExtractor:
     
     def _select_best_track(self, tracks: List[Dict], language: str, 
                           prefer_manual: bool) -> Optional[Dict]:
-        """Select the best caption track based on language and preference"""
+        """Select the best caption track based on language and preference"""        """Select the best caption track based on language and preference"""
         matching_tracks = [t for t in tracks if t.get('languageCode') == language]
         
         if not matching_tracks:
@@ -369,12 +468,28 @@ class YouTubeTranscriptExtractor:
         return matching_tracks[0]
     
     def get_transcript_text(self, video_url: str, language: str = 'en') -> str:
-        """Get transcript as a single text string"""
+        """Get transcript as a single text string
+        
+        Args:
+            video_url: YouTube video URL or ID
+            language: Language code (e.g., 'en', 'es', 'fr')
+            
+        Returns:
+            Complete transcript as a single string with spaces between segments
+        """
         segments = self.get_transcript(video_url, language)
         return ' '.join(segment['text'] for segment in segments)
     
     def get_transcript_with_timestamps(self, video_url: str, language: str = 'en') -> str:
-        """Get transcript formatted with timestamps"""
+        """Get transcript formatted with timestamps
+        
+        Args:
+            video_url: YouTube video URL or ID
+            language: Language code (e.g., 'en', 'es', 'fr')
+            
+        Returns:
+            Formatted transcript with timestamps like "[MM:SS] text"
+        """
         segments = self.get_transcript(video_url, language)
         formatted_lines = []
         
@@ -385,7 +500,14 @@ class YouTubeTranscriptExtractor:
         return '\n'.join(formatted_lines)
     
     def _format_timestamp(self, seconds: float) -> str:
-        """Format seconds as MM:SS or HH:MM:SS"""
+        """Format seconds as MM:SS or HH:MM:SS
+        
+        Args:
+            seconds: Time in seconds as float
+            
+        Returns:
+            Formatted timestamp string
+        """
         hours = int(seconds // 3600)
         minutes = int((seconds % 3600) // 60)
         secs = int(seconds % 60)
@@ -394,56 +516,3 @@ class YouTubeTranscriptExtractor:
             return f"{hours:02d}:{minutes:02d}:{secs:02d}"
         else:
             return f"{minutes:02d}:{secs:02d}"
-
-
-def main():
-    """Example usage and testing"""
-    extractor = YouTubeTranscriptExtractor()
-    
-    # Test with a known video (replace with actual video URL)
-    test_urls = [
-        "https://www.youtube.com/watch?v=dQw4w9WgXcQ",  # Rick Astley - Never Gonna Give You Up
-        "https://youtu.be/dQw4w9WgXcQ",                 # Short format
-    ]
-    
-    for url in test_urls:
-        print(f"\n{'='*60}")
-        print(f"Testing URL: {url}")
-        print('='*60)
-        
-        try:
-            # Get available languages
-            print("\nAvailable languages:")
-            languages = extractor.get_available_languages(url)
-            for lang in languages:
-                status = "auto-generated" if lang['auto_generated'] else "manual"
-                print(f"  - {lang['name']} ({lang['code']}) [{status}]")
-            
-            # Get transcript
-            print("\nExtracting transcript...")
-            transcript = extractor.get_transcript(url, language='en')
-            
-            # Display first 5 segments
-            print(f"\nFirst 5 segments (out of {len(transcript)}):")
-            for i, segment in enumerate(transcript[:5]):
-                timestamp = extractor._format_timestamp(segment['start'])
-                print(f"  [{timestamp}] {segment['text']}")
-            
-            # Get full text version
-            print("\nFirst 200 characters of full text:")
-            full_text = extractor.get_transcript_text(url)
-            print(f"  {full_text[:200]}...")
-            
-            break  # Success, exit loop
-            
-        except Exception as e:
-            print(f"Error: {e}")
-            print("Trying next URL...")
-            continue
-    
-    print(f"\n{'='*60}")
-    print("Test completed!")
-
-
-if __name__ == "__main__":
-    main()

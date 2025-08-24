@@ -1,7 +1,37 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
 [project]
-name = "youtube-transcript-extractor"
-version = "0.1.0"
-description = "YouTube transcript extraction using Python requests with 2024-2025 anti-bot handling"
+name = "yt-ts-extract"
+version = "1.0.0"
+description = "Extract transcripts from YouTube videos with multi-language support and various output formats"
+readme = "README.md"
+license = {file = "LICENSE"}
+authors = [
+    {name = "Your Name", email = "your.email@example.com"},
+]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "Intended Audience :: End Users/Desktop",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Internet :: WWW/HTTP",
+    "Topic :: Multimedia :: Video",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Text Processing",
+]
+keywords = [
+    "youtube", "transcript", "subtitles", "captions", "video", 
+    "extract", "srt", "multilanguage", "cli", "automation"
+]
 requires-python = ">=3.8"
 dependencies = [
     "requests>=2.31.0",
@@ -12,7 +42,18 @@ dev = [
     "pytest>=7.0.0",
     "black>=22.0.0",
     "isort>=5.0.0",
+    "build>=0.10.0",
+    "twine>=4.0.0",
 ]
+
+[project.urls]
+Homepage = "https://github.com/sinjab/yt-ts-extract"
+Documentation = "https://github.com/sinjab/yt-ts-extract#readme"
+Repository = "https://github.com/sinjab/yt-ts-extract"
+Issues = "https://github.com/sinjab/yt-ts-extract/issues"
+
+[project.scripts]
+yt-transcript = "yt_ts_extract.cli:main"
 
 [tool.black]
 line-length = 88
@@ -21,3 +62,6 @@ target-version = ['py38']
 [tool.isort]
 profile = "black"
 line_length = 88
+
+[tool.hatch.build.targets.wheel]
+packages = ["yt_ts_extract"]

@@ -7,14 +7,15 @@ Simple CLI for easy transcript extraction with various output formats.
 import argparse
 import sys
 import os
-from main import YouTubeTranscriptExtractor
-from utils import (
+from .extractor import YouTubeTranscriptExtractor
+from .utils import (
     export_to_srt, clean_transcript_text, extract_keywords, 
     search_transcript, create_summary, get_transcript_stats, batch_process_urls
 )
 
 
 def main():
+    """Main CLI entry point"""
     parser = argparse.ArgumentParser(
         description="Extract transcripts from YouTube videos",
         formatter_class=argparse.RawDescriptionHelpFormatter,
@@ -200,16 +201,16 @@ def run_examples():
     print("=" * 50)
     
     examples = [
-        ("Basic text extraction", 'python cli.py "https://www.youtube.com/watch?v=VIDEO_ID"'),
-        ("Save as SRT file", 'python cli.py -f srt -o video.srt "https://youtu.be/VIDEO_ID"'),
-        ("Get transcript stats", 'python cli.py -f stats "https://www.youtube.com/watch?v=VIDEO_ID"'),
-        ("Extract with summary", 'python cli.py --summary 3 "https://www.youtube.com/watch?v=VIDEO_ID"'),
-        ("Get top keywords", 'python cli.py --keywords 10 "https://www.youtube.com/watch?v=VIDEO_ID"'),
-        ("Search transcript", 'python cli.py --search "keyword" "https://www.youtube.com/watch?v=VIDEO_ID"'),
-        ("Clean text output", 'python cli.py --clean -o clean.txt "https://www.youtube.com/watch?v=VIDEO_ID"'),
-        ("List languages", 'python cli.py --list-languages "https://www.youtube.com/watch?v=VIDEO_ID"'),
-        ("Batch processing", 'python cli.py --batch urls.txt --output-dir transcripts/'),
-        ("Timestamped segments", 'python cli.py -f segments "https://www.youtube.com/watch?v=VIDEO_ID"'),
+        ("Basic text extraction", 'yt-transcript "https://www.youtube.com/watch?v=VIDEO_ID"'),
+        ("Save as SRT file", 'yt-transcript -f srt -o video.srt "https://youtu.be/VIDEO_ID"'),
+        ("Get transcript stats", 'yt-transcript -f stats "https://www.youtube.com/watch?v=VIDEO_ID"'),
+        ("Extract with summary", 'yt-transcript --summary 3 "https://www.youtube.com/watch?v=VIDEO_ID"'),
+        ("Get top keywords", 'yt-transcript --keywords 10 "https://www.youtube.com/watch?v=VIDEO_ID"'),
+        ("Search transcript", 'yt-transcript --search "keyword" "https://www.youtube.com/watch?v=VIDEO_ID"'),
+        ("Clean text output", 'yt-transcript --clean -o clean.txt "https://www.youtube.com/watch?v=VIDEO_ID"'),
+        ("List languages", 'yt-transcript --list-languages "https://www.youtube.com/watch?v=VIDEO_ID"'),
+        ("Batch processing", 'yt-transcript --batch urls.txt --output-dir transcripts/'),
+        ("Timestamped segments", 'yt-transcript -f segments "https://www.youtube.com/watch?v=VIDEO_ID"'),
     ]
     
     for description, command in examples:
