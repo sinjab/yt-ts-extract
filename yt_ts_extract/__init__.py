@@ -7,10 +7,10 @@ and various output formats.
 Usage:
     # SDK/API Usage
     from yt_ts_extract import YouTubeTranscriptExtractor
-    
+
     extractor = YouTubeTranscriptExtractor()
     transcript = extractor.get_transcript("VIDEO_ID")
-    
+
     # CLI Usage
     $ yt-transcript VIDEO_ID
     $ yt-transcript -f srt -o subtitles.srt VIDEO_ID
