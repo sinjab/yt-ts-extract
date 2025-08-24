@@ -1,6 +1,77 @@
+# AI coding assistants
 .aider*
+
+# Environment files
 .env
+.env.local
+
+# Python version management
 .python-version
+
+# UV lock file (can be regenerated)
 uv.lock
+
+# IDE/Editor files
 *.code-workspace
+.vscode/
+.idea/
+
+# Python cache
 __pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual environments
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# Debug files
+debug_*.py
+debug_*.html
+debug_*.json
+debug_*.txt
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+*.backup
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Test outputs (keep test.srt as example)
+test_*.srt
+test_*.json
+test_*.txt
