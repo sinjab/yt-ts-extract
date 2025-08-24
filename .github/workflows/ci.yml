@@ -1,0 +1,48 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  unit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install uv
+        run: |
+          pip install uv
+      - name: Sync deps
+        run: |
+          uv sync --group dev
+      - name: Run unit tests with coverage
+        run: |
+          uv run pytest -q
+
+  e2e:
+    runs-on: ubuntu-latest
+    needs: unit
+    if: github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && contains(github.ref, 'e2e'))
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install uv
+        run: |
+          pip install uv
+      - name: Sync deps
+        run: |
+          uv sync --group dev
+      - name: Run E2E tests (networked)
+        env:
+          PYTEST_DISABLE_PLUGIN_AUTOLOAD: '1'
+        run: |
+          uv run pytest -q -m e2e

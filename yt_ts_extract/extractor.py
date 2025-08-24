@@ -42,11 +42,22 @@ class YouTubeTranscriptExtractor:
         languages = extractor.get_available_languages("dQw4w9WgXcQ")
     """
     
-    def __init__(self):
-        """Initialize the extractor with session and headers."""
+    def __init__(self, *, timeout: float = 30, max_retries: int = 3, backoff_factor: float = 0.75, min_delay: float = 2):
+        """Initialize the extractor with session, headers, and resilience controls.
+
+        Args:
+            timeout: per-request timeout in seconds (default: 30)
+            max_retries: number of HTTP retry attempts on failure (default: 3)
+            backoff_factor: base backoff factor for retries (default: 0.75)
+            min_delay: minimum delay between requests for rate limiting (default: 2)
+        """
         self.session = requests.Session()
         self.last_request_time = 0
-        self.min_delay = 2  # Minimum seconds between requests
+        self.min_delay = float(min_delay)
+        # Resilience controls
+        self.timeout = float(timeout)
+        self.max_retries = int(max_retries)
+        self.backoff_factor = float(backoff_factor)
         
         # Essential headers to mimic legitimate browser requests
         self.session.headers.update({
@@ -64,6 +75,46 @@ class YouTubeTranscriptExtractor:
         
         # Ensure automatic gzip decompression
         self.session.headers['Accept-Encoding'] = 'gzip, deflate, br'
+
+    def _request_with_retries(self, method: str, url: str, *, use_session: bool = True, **kwargs):
+        """HTTP request with retries and exponential backoff.
+
+        Args:
+            method: 'get' or 'post'
+            url: target URL
+            use_session: whether to use self.session (for GETs) or raw requests
+            kwargs: passed to requests call
+
+        Returns:
+            requests.Response
+
+        Raises:
+            requests.RequestException on final failure
+        """
+        attempt = 0
+        last_exc = None
+        while attempt < self.max_retries:
+            try:
+                caller = (self.session if use_session else requests)
+                if 'timeout' not in kwargs:
+                    kwargs['timeout'] = self.timeout
+                if method.lower() == 'get':
+                    return caller.get(url, **kwargs)
+                elif method.lower() == 'post':
+                    return caller.post(url, **kwargs)
+                else:
+                    raise ValueError(f"Unsupported method: {method}")
+            except (requests.Timeout, requests.ConnectionError, requests.HTTPError, requests.RequestException) as e:
+                last_exc = e
+                attempt += 1
+                if attempt >= self.max_retries:
+                    break
+                # Exponential backoff with jitter
+                delay = (self.backoff_factor * (2 ** (attempt - 1))) + uniform(0, 0.5)
+                logger.warning(f"Request failed (attempt {attempt}/{self.max_retries}) for {url}: {e}. Retrying in {delay:.2f}s")
+                time.sleep(delay)
+        # Re-raise the last exception to be handled by callers preserving messages
+        raise last_exc
     
     def _wait_if_needed(self):
         """Implement rate limiting to avoid being blocked"""
@@ -84,7 +135,7 @@ class YouTubeTranscriptExtractor:
         logger.info(f"Fetching video page for ID: {video_id}")
         
         try:
-            response = self.session.get(url, timeout=30)
+            response = self._request_with_retries('get', url, use_session=True)
             
             # Check for blocks
             if 'recaptcha' in response.text.lower():
@@ -143,7 +194,7 @@ class YouTubeTranscriptExtractor:
         logger.info("Calling Innertube API with Android client")
         try:
             # Use a fresh requests call instead of self.session to avoid header conflicts
-            response = requests.post(url, json=payload, headers=headers, timeout=30)
+            response = self._request_with_retries('post', url, use_session=False, json=payload, headers=headers)
             response.raise_for_status()
             
             # Debug: Check response
@@ -224,7 +275,7 @@ class YouTubeTranscriptExtractor:
         
         logger.debug(f"Fetching transcript XML from: {url[:100]}...")
         try:
-            response = self.session.get(url, timeout=30)
+            response = self._request_with_retries('get', url, use_session=True)
             response.raise_for_status()
             return response.text
         except requests.RequestException as e:

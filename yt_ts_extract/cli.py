@@ -59,6 +59,16 @@ Examples:
                         help='Enable verbose output')
     parser.add_argument('--examples', action='store_true',
                         help='Run example demonstrations')
+
+    # Network/resilience options
+    parser.add_argument('--timeout', type=float, default=30.0,
+                        help='Per-request timeout in seconds (default: 30)')
+    parser.add_argument('--retries', type=int, default=3,
+                        help='Max HTTP retries on failure (default: 3)')
+    parser.add_argument('--backoff', type=float, default=0.75,
+                        help='Exponential backoff factor (default: 0.75)')
+    parser.add_argument('--min-delay', dest='min_delay', type=float, default=2.0,
+                        help='Minimum delay between requests for rate limiting (default: 2)')
     
     args = parser.parse_args()
     
@@ -74,8 +84,13 @@ Examples:
     if not args.video_id:
         parser.error("VIDEO_ID is required unless using --batch or --examples")
     
-    # Initialize extractor
-    extractor = YouTubeTranscriptExtractor()
+    # Initialize extractor with resilience options
+    extractor = YouTubeTranscriptExtractor(
+        timeout=args.timeout,
+        max_retries=args.retries,
+        backoff_factor=args.backoff,
+        min_delay=args.min_delay,
+    )
     
     try:
         # List languages if requested

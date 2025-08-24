@@ -42,7 +42,7 @@ from .utils import (
 )
 
 # Convenience functions for common use cases
-def get_transcript(video_id: str, language: str = 'en') -> list:
+def get_transcript(video_id: str, language: str = 'en', **extractor_options) -> list:
     """
     Quick function to get transcript segments.
     
@@ -56,11 +56,11 @@ def get_transcript(video_id: str, language: str = 'en') -> list:
     Example:
         transcript = get_transcript("dQw4w9WgXcQ")
     """
-    extractor = YouTubeTranscriptExtractor()
+    extractor = YouTubeTranscriptExtractor(**extractor_options)
     return extractor.get_transcript(video_id, language)
 
 
-def get_transcript_text(video_id: str, language: str = 'en') -> str:
+def get_transcript_text(video_id: str, language: str = 'en', **extractor_options) -> str:
     """
     Quick function to get transcript as plain text.
     
@@ -74,11 +74,11 @@ def get_transcript_text(video_id: str, language: str = 'en') -> str:
     Example:
         text = get_transcript_text("dQw4w9WgXcQ")
     """
-    extractor = YouTubeTranscriptExtractor()
+    extractor = YouTubeTranscriptExtractor(**extractor_options)
     return extractor.get_transcript_text(video_id, language)
 
 
-def get_available_languages(video_id: str) -> list:
+def get_available_languages(video_id: str, **extractor_options) -> list:
     """
     Quick function to get available transcript languages.
     
@@ -93,7 +93,7 @@ def get_available_languages(video_id: str) -> list:
         for lang in languages:
             print(f"{lang['name']} ({lang['code']})")
     """
-    extractor = YouTubeTranscriptExtractor()
+    extractor = YouTubeTranscriptExtractor(**extractor_options)
     return extractor.get_available_languages(video_id)
 
 

@@ -69,6 +69,9 @@ packages = ["yt_ts_extract"]
 # Test/coverage config
 [tool.pytest.ini_options]
 addopts = "-q --cov=yt_ts_extract --cov-report=term-missing"
+markers = [
+  "e2e: end-to-end tests that hit real network APIs (YouTube)",
+]
 
 [tool.coverage.run]
 source = ["yt_ts_extract"]
