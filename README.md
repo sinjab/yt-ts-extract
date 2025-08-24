@@ -373,5 +373,95 @@ print(f"Word count: {stats['word_count']} words")
 ### Android Client Implementation
 The extractor uses Android YouTube client headers to bypass anti-bot measures:
 
+```http
+User-Agent: com.google.android.youtube/20.10.38 (Linux; U; Android 14) gzip
+X-YouTube-Client-Name: 3
+X-YouTube-Client-Version: 20.10.38
+Content-Type: application/json
 ```
+
+This approach mimics the official Android YouTube app, making requests appear as legitimate mobile traffic.
+
+### Dual XML Parser System
+The library supports both legacy and current YouTube transcript formats:
+- **Legacy format**: Direct XML transcript data
+- **Current format**: API-based JSON responses with embedded XML
+
+### Proxy Architecture
+The new proxy rotation system provides enterprise-grade reliability:
+
+```python
+# Proxy rotation strategies
+rotation_strategies = {
+    'random': 'Random selection for load distribution',
+    'round_robin': 'Sequential rotation for even usage', 
+    'least_used': 'Smart selection based on usage stats'
+}
+
+# Health monitoring
+- Automatic proxy health checks
+- Failed proxy deactivation with cooldown
+- Real-time proxy statistics and monitoring
 ```
+
+### Error Handling & Recovery
+- **Exponential backoff**: Prevents overwhelming servers during failures
+- **Retry mechanisms**: Configurable retry logic with circuit breaking
+- **Graceful degradation**: Falls back to alternative extraction methods
+- **Rate limiting**: Built-in delays prevent IP-based blocking
+
+## 🧪 Testing
+
+The project includes comprehensive testing:
+
+```bash
+# Run all tests
+uv run pytest
+
+# Run with coverage
+uv run pytest --cov=yt_ts_extract --cov-report=term-missing
+
+# Run specific test suites
+uv run pytest tests/test_proxy_manager.py -v
+uv run pytest tests/test_e2e_proxy.py -v
+
+# End-to-end testing
+uv run pytest tests/test_e2e_cli.py -v
+```
+
+### Test Categories
+- **Unit tests**: Individual component testing
+- **Integration tests**: CLI and API integration testing  
+- **E2E tests**: Full workflow testing with real YouTube videos
+- **Proxy tests**: Proxy rotation and health check testing
+- **Network resilience**: Timeout and retry behavior testing
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch: `git checkout -b feature/amazing-feature`
+3. Make your changes and add tests
+4. Run the test suite: `uv run pytest`
+5. Submit a pull request
+
+### Development Setup
+```bash
+git clone https://github.com/sinjab/yt-ts-extract.git
+cd yt-ts-extract
+uv sync  # Install dependencies
+uv run pytest  # Run tests
+```
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🆘 Support
+
+- **Issues**: [GitHub Issues](https://github.com/sinjab/yt-ts-extract/issues)
+- **Documentation**: This README and inline code documentation
+- **Examples**: Check the `examples/` directory for usage patterns
+
+---
+
+**Made with ❤️ for the developer community. Happy transcript extracting!**
