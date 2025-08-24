@@ -107,15 +107,19 @@ def language_detection_example():
         languages = extractor.get_available_languages(test_url)
         print(f"Available languages for this video: {len(languages)}")
         
-        for lang_code, lang_name in languages.items():
-            print(f"  - {lang_code}: {lang_name}")
+        for lang in languages:
+            lang_code = lang['code']
+            lang_name = lang['name']
+            auto_status = " (auto-generated)" if lang['auto_generated'] else " (manual)"
+            print(f"  - {lang_code}: {lang_name}{auto_status}")
             
         # Try to extract with a specific language (if available)
         if languages:
-            first_lang = list(languages.keys())[0]
-            print(f"\nTrying to extract transcript in '{first_lang}'...")
-            transcript = extractor.get_transcript(test_url, language_code=first_lang)
-            print(f"Success! Got {len(transcript)} segments in {languages[first_lang]}")
+            first_lang = languages[0]['code']
+            first_lang_name = languages[0]['name']
+            print(f"\nTrying to extract transcript in '{first_lang}' ({first_lang_name})...")
+            transcript = extractor.get_transcript(test_url, language=first_lang)
+            print(f"Success! Got {len(transcript)} segments in {first_lang_name}")
             
     except Exception as e:
         print(f"Error: {e}")

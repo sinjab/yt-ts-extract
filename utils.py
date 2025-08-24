@@ -4,9 +4,11 @@ YouTube Transcript Extractor - Utility Functions
 Additional helper functions for common transcript processing tasks.
 """
 
+import os
 import re
 from typing import List, Dict, Optional
 from collections import Counter
+from datetime import datetime
 from main import YouTubeTranscriptExtractor
 
 
@@ -313,9 +315,6 @@ def batch_process_urls(urls: List[str], output_dir: str = "transcripts/") -> Dic
         ]
         results = batch_process_urls(urls, "my_transcripts/")
     """
-    import os
-    from datetime import datetime
-    
     extractor = YouTubeTranscriptExtractor()
     results = {
         'successful': [],
