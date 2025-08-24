@@ -10,6 +10,12 @@ import pytest
 import os
 import time
 from unittest.mock import patch, Mock
+
+# Skip real network E2E tests on CI to avoid flakiness (e.g., age restrictions)
+pytestmark = pytest.mark.skipif(
+    os.getenv("GITHUB_ACTIONS") == "true" or os.getenv("CI") == "true",
+    reason="Skip real network E2E tests on CI",
+)
 from yt_ts_extract import YouTubeTranscriptExtractor, get_transcript
 
 

@@ -1,8 +1,14 @@
 import sys
+import os
 import pytest
 
 from yt_ts_extract.cli import main
 
+# Skip real network E2E tests on CI to avoid flakiness (e.g., age restrictions)
+pytestmark = pytest.mark.skipif(
+    os.getenv("GITHUB_ACTIONS") == "true",
+    reason="Skip real network E2E tests on CI",
+)
 
 @pytest.mark.e2e
 class TestE2ECLI:
