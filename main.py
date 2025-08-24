@@ -164,7 +164,15 @@ class YouTubeTranscriptExtractor:
         logger.info(f"Found {len(tracks)} caption tracks")
         for i, track in enumerate(tracks):
             lang = track.get('languageCode', 'unknown')
-            name = track.get('name', {}).get('simpleText', 'Unknown')
+            
+            # Extract name from the correct structure
+            name = 'Unknown'
+            if 'name' in track:
+                if 'runs' in track['name'] and track['name']['runs']:
+                    name = track['name']['runs'][0].get('text', 'Unknown')
+                elif 'simpleText' in track['name']:
+                    name = track['name']['simpleText']
+            
             track_type = 'auto-generated' if track.get('kind') == 'asr' else 'manual'
             logger.info(f"  Track {i+1}: {name} ({lang}) - {track_type}")
         
@@ -270,9 +278,17 @@ class YouTubeTranscriptExtractor:
         
         languages = []
         for track in tracks:
+            # Extract name from the correct structure
+            name = 'Unknown'
+            if 'name' in track:
+                if 'runs' in track['name'] and track['name']['runs']:
+                    name = track['name']['runs'][0].get('text', 'Unknown')
+                elif 'simpleText' in track['name']:
+                    name = track['name']['simpleText']
+            
             languages.append({
                 'code': track.get('languageCode'),
-                'name': track.get('name', {}).get('simpleText', 'Unknown'),
+                'name': name,
                 'auto_generated': track.get('kind') == 'asr'
             })
         
@@ -312,7 +328,15 @@ class YouTubeTranscriptExtractor:
                 raise Exception(f"No transcript available for language '{language}'. Available: {available}")
             
             # Step 5: Fetch and parse transcript
-            logger.info(f"Selected track: {selected_track.get('name', {}).get('simpleText', 'Unknown')}")
+            # Extract name from the correct structure for selected track logging
+            track_name = 'Unknown'
+            if 'name' in selected_track:
+                if 'runs' in selected_track['name'] and selected_track['name']['runs']:
+                    track_name = selected_track['name']['runs'][0].get('text', 'Unknown')
+                elif 'simpleText' in selected_track['name']:
+                    track_name = selected_track['name']['simpleText']
+            
+            logger.info(f"Selected track: {track_name}")
             xml_content = self.fetch_transcript_xml(selected_track['baseUrl'])
             transcript = self.parse_xml_transcript(xml_content)
             
