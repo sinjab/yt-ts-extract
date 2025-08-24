@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  unit:
+  quality:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -18,16 +18,61 @@ jobs:
       - name: Install uv
         run: |
           pip install uv
+      - name: Cache dependencies
+        uses: actions/cache@v4
+        with:
+          path: .cache/uv
+          key: ${{ runner.os }}-uv-${{ hashFiles('**/uv.lock') }}
+      - name: Sync deps
+        run: |
+          uv sync --group dev
+      - name: Run linting
+        run: |
+          uv run pycodestyle yt_ts_extract/ --max-line-length=120 --ignore=E203,W503,W293
+      - name: Check formatting
+        run: |
+          uv run black --check --diff yt_ts_extract/
+      - name: Type checking
+        run: |
+          uv run mypy yt_ts_extract/ --ignore-missing-imports --no-error-summary
+        continue-on-error: true
+
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.8', '3.9', '3.10', '3.11', '3.12']
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install uv
+        run: |
+          pip install uv
+      - name: Cache dependencies
+        uses: actions/cache@v4
+        with:
+          path: .cache/uv
+          key: ${{ runner.os }}-uv-${{ matrix.python-version }}-${{ hashFiles('**/uv.lock') }}
       - name: Sync deps
         run: |
           uv sync --group dev
       - name: Run unit tests with coverage
         run: |
-          uv run pytest -q
+          uv run pytest --cov=yt_ts_extract --cov-report=xml --cov-report=term-missing
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          file: ./coverage.xml
+          flags: unittests
+          name: codecov-umbrella
+          fail_ci_if_error: false
 
   e2e:
     runs-on: ubuntu-latest
-    needs: unit
+    needs: [quality, test]
     if: github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && contains(github.ref, 'e2e'))
     steps:
       - uses: actions/checkout@v4
@@ -38,6 +83,11 @@ jobs:
       - name: Install uv
         run: |
           pip install uv
+      - name: Cache dependencies
+        uses: actions/cache@v4
+        with:
+          path: .cache/uv
+          key: ${{ runner.os }}-uv-${{ hashFiles('**/uv.lock') }}
       - name: Sync deps
         run: |
           uv sync --group dev
@@ -45,4 +95,11 @@ jobs:
         env:
           PYTEST_DISABLE_PLUGIN_AUTOLOAD: '1'
         run: |
-          uv run pytest -q -m e2e
+          uv run pytest -m e2e --cov=yt_ts_extract --cov-report=xml --cov-report=term-missing
+      - name: Upload E2E coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          file: ./coverage.xml
+          flags: e2e
+          name: codecov-umbrella
+          fail_ci_if_error: false

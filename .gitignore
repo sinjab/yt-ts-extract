@@ -76,4 +76,69 @@ Thumbs.db
 # Coverage
 .coverage
 .coverage.*
+htmlcov/
+coverage.xml
+.pytest_cache/
+
+# UV cache and build artifacts
+.cache/
+.uv/
+
+# MyPy cache
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Black cache
+.black_cache/
+
+# pycodestyle cache
+.pytest_cache/
+
+# IDE/Editor additional files
+*.swp
+*.swo
+*~
+
+# OS additional files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Temporary test files
+test_output/
+*.log
+
+# Jupyter notebooks (if any)
+.ipynb_checkpoints/
+
+# Local configuration overrides
+local_config.py
+local_settings.py
+
+# Documentation build artifacts
+docs/_build/
+docs/build/
+
+# Sphinx documentation
+docs/source/_build/
+
+# Jupyter notebook outputs
+*.ipynb
+
+# Environment variables
+.envrc
+
+# Pre-commit hooks cache
+.pre-commit-config.yaml
+
+# Tox testing
+.tox/
+
+# Coverage badge (if generated)
+coverage-badge.svg
+
+# Local development files
+local_*
+dev_*
 
