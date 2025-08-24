@@ -82,7 +82,12 @@ langs = get_available_languages("dQw4w9WgXcQ")
 print(f"Languages available: {[l['code'] for l in langs]}")
 
 # Or using the class directly
-extractor = YouTubeTranscriptExtractor()
+extractor = YouTubeTranscriptExtractor(
+    timeout=20,        # per-request timeout (seconds)
+    max_retries=5,     # HTTP retries on transient failures
+    backoff_factor=1.0,# exponential backoff factor
+    min_delay=1.5      # minimum delay between requests (rate limiting)
+)
 segments = extractor.get_transcript("dQw4w9WgXcQ", language="en")
 stats = get_transcript_stats(segments)
 print(stats)
@@ -103,7 +108,23 @@ Options:
   --output-dir PATH      Directory for batch output files
   --search TEXT          Search for specific text in transcript
   --examples             Show usage examples
+  --timeout FLOAT        Per-request timeout in seconds (default: 30)
+  --retries INT          Max HTTP retries on failure (default: 3)
+  --backoff FLOAT        Exponential backoff factor (default: 0.75)
+  --min-delay FLOAT      Minimum delay between requests for rate limiting (default: 2)
   --help                 Show this message and exit
+```
+
+### Network resilience tuning
+
+You can tune network behavior to improve reliability in flaky environments or speed up trusted CI environments:
+
+```bash
+# Increase retries and timeout
+yt-transcript dQw4w9WgXcQ --retries 5 --timeout 45
+
+# Reduce delay for faster runs (use responsibly)
+yt-transcript dQw4w9WgXcQ --min-delay 1.0 --backoff 0.5
 ```
 
 ## 📊 Output Formats
@@ -272,6 +293,18 @@ The library has been tested with various video types:
 - ✅ 61 transcript segments extracted
 - ✅ 6 language tracks available
 - ✅ Perfect SRT format export
+
+### End-to-end (E2E) tests
+
+E2E tests hit real YouTube endpoints and are marked with `@pytest.mark.e2e`.
+
+```bash
+# Run only E2E tests
+uv run pytest -q -m e2e
+
+# Example: run a single E2E test file
+uv run pytest -q tests/test_e2e_cli.py -m e2e
+```
 
 **Educational Content** (`9bZkp7q19f0`)
 - ✅ Multiple language support verified
