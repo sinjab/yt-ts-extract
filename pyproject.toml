@@ -1,16 +1,94 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
 [project]
-name = "snake-game"
-version = "0.1.0"
-description = "Classic Snake Game"
-authors = [
-    {name = "Khaldoon Sinjab", email = "sinjab@gmail.com"}
-]
+name = "yt-ts-extract"
+version = "1.0.0"
+description = "Extract transcripts from YouTube videos with multi-language support and various output formats"
 readme = "README.md"
+license = {file = "LICENSE"}
+authors = [
+    {name = "Khaldoon Sinjab", email = "sinjab@gmail.com"},
+]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "Intended Audience :: End Users/Desktop",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Internet :: WWW/HTTP",
+    "Topic :: Multimedia :: Video",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Text Processing",
+]keywords = [
+    "youtube", "transcript", "subtitles", "captions", "video", 
+    "extract", "srt", "multilanguage", "cli", "automation"
+]
 requires-python = ">=3.8"
 dependencies = [
-    "pygame >=2.5.2,<3.0.0"
+    "requests>=2.31.0",
 ]
 
-[build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "black>=22.0.0",
+    "isort>=5.0.0",
+    "build>=0.10.0",
+    "twine>=4.0.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/sinjab/yt-ts-extract"
+Documentation = "https://github.com/sinjab/yt-ts-extract#readme"
+Repository = "https://github.com/sinjab/yt-ts-extract"
+Issues = "https://github.com/sinjab/yt-ts-extract/issues"
+
+[project.scripts]
+yt-transcript = "yt_ts_extract.cli:main"
+
+[tool.black]
+line-length = 88
+target-version = ['py38']
+
+[tool.isort]
+profile = "black"
+line_length = 88
+
+[tool.hatch.build.targets.wheel]
+packages = ["yt_ts_extract"]
+
+# Test/coverage config
+[tool.pytest.ini_options]
+addopts = "-q --cov=yt_ts_extract --cov-report=term-missing"
+markers = [
+  "e2e: end-to-end tests that hit real network APIs (YouTube)",
+]
+
+[tool.coverage.run]
+source = ["yt_ts_extract"]
+omit = [
+  "yt_ts_extract/examples/*",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+  "if __name__ == \"__main__\":",
+]
+
+[dependency-groups]
+dev = [
+    "black>=24.8.0",
+    "build>=1.2.2.post1",
+    "isort>=5.13.2",
+    "pytest>=8.3.5",
+    "pytest-cov>=5.0.0",
+    "twine>=6.1.0",
+]
