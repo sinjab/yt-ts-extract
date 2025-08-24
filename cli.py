@@ -107,7 +107,11 @@ Examples:
         elif args.format == 'stats':
             output = format_stats(transcript, args)
         else:  # text format
-            text = extractor.get_transcript_text(args.url, language)
+            # Convert existing transcript to text instead of re-extracting
+            text_parts = []
+            for segment in transcript:
+                text_parts.append(segment['text'])
+            text = ' '.join(text_parts)
             output = clean_transcript_text(text) if args.clean else text
         
         # Handle additional content requests

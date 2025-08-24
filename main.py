@@ -91,34 +91,9 @@ class YouTubeTranscriptExtractor:
             raise Exception(f"Failed to fetch video page: {e}")
     
     def get_api_key_from_homepage(self) -> str:
-        """Get API key from YouTube homepage - more reliable than video page"""
-        self._wait_if_needed()
-        
-        logger.info("Fetching API key from YouTube homepage")
-        try:
-            response = self.session.get("https://www.youtube.com", timeout=30)
-            response.raise_for_status()
-            html = response.text
-            
-            patterns = [
-                r'"INNERTUBE_API_KEY":"([^"]+)"',
-                r'"innertubeApiKey":"([^"]+)"',
-            ]
-            
-            for pattern in patterns:
-                match = re.search(pattern, html)
-                if match:
-                    key = match.group(1)
-                    logger.debug(f"Extracted API key from homepage: {key[:10]}...")
-                    return key
-            
-            # Fallback to known working key
-            logger.warning("Could not extract API key, using fallback")
-            return "AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8"
-            
-        except requests.RequestException as e:
-            logger.warning(f"Failed to get API key from homepage: {e}, using fallback")
-            return "AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8"
+        """Get API key using known working key"""
+        logger.info("Using known working API key")
+        return "AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8"
     
     def call_innertube_api(self, video_id: str, api_key: str) -> dict:
         """Call YouTube's Innertube API using Android client"""
