@@ -65,3 +65,28 @@ line_length = 88
 
 [tool.hatch.build.targets.wheel]
 packages = ["yt_ts_extract"]
+
+# Test/coverage config
+[tool.pytest.ini_options]
+addopts = "-q --cov=yt_ts_extract --cov-report=term-missing"
+
+[tool.coverage.run]
+source = ["yt_ts_extract"]
+omit = [
+  "yt_ts_extract/examples/*",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+  "if __name__ == \"__main__\":",
+]
+
+[dependency-groups]
+dev = [
+    "black>=24.8.0",
+    "build>=1.2.2.post1",
+    "isort>=5.13.2",
+    "pytest>=8.3.5",
+    "pytest-cov>=5.0.0",
+    "twine>=6.1.0",
+]

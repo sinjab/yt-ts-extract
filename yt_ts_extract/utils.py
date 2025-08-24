@@ -90,8 +90,8 @@ def clean_transcript_text(text: str) -> str:
     text = re.sub(r'\[Laughter\]', '', text, flags=re.IGNORECASE)
     
     # Fix common punctuation issues
-    text = re.sub(r'\s+([.!?])', r'\\1', text)  # Remove space before punctuation
-    text = re.sub(r'([.!?])\\s*([a-z])', r'\\1 \\2', text)  # Add space after punctuation
+    text = re.sub(r'\s+([.!?])', r'\1', text)  # Remove space before punctuation
+    text = re.sub(r'([.!?])\s*([a-z])', r'\1 \2', text)  # Add space after punctuation
     
     # Capitalize sentences
     sentences = text.split('. ')
