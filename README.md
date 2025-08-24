@@ -9,7 +9,7 @@ A robust Python library and CLI tool for extracting YouTube video transcripts wi
 ## ✨ Key Features
 
 ### 🎯 Core Functionality
-- **Extract transcripts** from YouTube videos via URL
+- **Extract transcripts** from YouTube videos via video ID
 - **26+ language support** (English, Spanish, French, German, Japanese, Arabic, Chinese, etc.)
 - **Multiple output formats**: plain text, SRT subtitles, timestamped segments, JSON
 - **Batch processing** for multiple videos
@@ -40,17 +40,17 @@ pip install -e .
 After installation, use the `yt-transcript` command:
 
 ```bash
-# Basic transcript extraction
-yt-transcript "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+# Basic transcript extraction (pass a video ID)
+yt-transcript dQw4w9WgXcQ
 
 # Export as SRT subtitles
-yt-transcript -f srt -o video.srt "https://www.youtube.com/watch?v=VIDEO_ID"
+yt-transcript -f srt -o video.srt dQw4w9WgXcQ
 
 # List available languages
-yt-transcript --list-languages "https://www.youtube.com/watch?v=VIDEO_ID"
+yt-transcript --list-languages dQw4w9WgXcQ
 
-# Batch process multiple videos
-yt-transcript --batch urls.txt --output-dir ./transcripts/
+# Batch process multiple videos (file of IDs)
+yt-transcript --batch ids.txt --output-dir ./transcripts/
 
 # Get help
 yt-transcript --help
@@ -59,27 +59,39 @@ yt-transcript --help
 ### Python Library
 
 ```python
-from yt_ts_extract import get_transcript, YouTubeTranscriptExtractor
+from yt_ts_extract import (
+    get_transcript,
+    get_transcript_text,
+    get_available_languages,
+    YouTubeTranscriptExtractor,
+)
+from yt_ts_extract.utils import export_to_srt, get_transcript_stats
 
-# Quick transcript extraction
-transcript = get_transcript("https://www.youtube.com/watch?v=dQw4w9WgXcQ")
-print(transcript)
+# Quick transcript extraction (ID only)
+transcript = get_transcript("dQw4w9WgXcQ")
+print(f"Segments: {len(transcript)}")
 
-# Advanced usage with extractor class
+# Export to SRT
+srt_text = export_to_srt(transcript)
+with open("video.srt", "w", encoding="utf-8") as f:
+    f.write(srt_text)
+
+# Plain text and languages
+text = get_transcript_text("dQw4w9WgXcQ")
+langs = get_available_languages("dQw4w9WgXcQ")
+print(f"Languages available: {[l['code'] for l in langs]}")
+
+# Or using the class directly
 extractor = YouTubeTranscriptExtractor()
-result = extractor.extract_transcript("VIDEO_URL", 
-                                     language="en", 
-                                     format="srt")
-
-# Get available languages
-languages = extractor.get_available_languages("VIDEO_URL")
-print(f"Available languages: {languages}")
+segments = extractor.get_transcript("dQw4w9WgXcQ", language="en")
+stats = get_transcript_stats(segments)
+print(stats)
 ```
 
 ## 🎛️ CLI Options
 
 ```bash
-yt-transcript [OPTIONS] VIDEO_URL
+yt-transcript [OPTIONS] VIDEO_ID
 
 Options:
   -f, --format [text|srt|segments|stats]
@@ -87,7 +99,7 @@ Options:
   -o, --output PATH      Save output to file
   -l, --language TEXT    Language code (e.g., 'en', 'es', 'fr')
   --list-languages       Show available languages for video
-  --batch PATH           Process URLs from file (one per line)
+  --batch PATH           Process video IDs from file (one per line)
   --output-dir PATH      Directory for batch output files
   --search TEXT          Search for specific text in transcript
   --examples             Show usage examples
@@ -163,48 +175,41 @@ And many more! Use `--list-languages` to see available languages for any video.
 
 ### Batch Processing
 
-Create a `urls.txt` file:
+Create an `ids.txt` file (one video ID per line):
 ```
-https://www.youtube.com/watch?v=dQw4w9WgXcQ
-https://www.youtube.com/watch?v=9bZkp7q19f0
-https://www.youtube.com/watch?v=wIwCTQZ_xFE
+dQw4w9WgXcQ
+9bZkp7q19f0
+wIwCTQZ_xFE
 ```
 
 Process all videos:
 ```bash
-yt-transcript --batch urls.txt --format srt --output-dir ./subtitles/
+yt-transcript --batch ids.txt --format srt --output-dir ./subtitles/
 ```
 
 ### Search Within Transcripts
 
 ```bash
 # Find mentions of specific topics
-yt-transcript --search "machine learning" "VIDEO_URL"
+yt-transcript --search "machine learning" VIDEO_ID
 ```
 
 ### Python Library Advanced Features
 
 ```python
 from yt_ts_extract import YouTubeTranscriptExtractor
-import json
+from yt_ts_extract.utils import get_transcript_stats
 
 extractor = YouTubeTranscriptExtractor()
 
-# Extract with specific options
-result = extractor.extract_transcript(
-    video_url="https://www.youtube.com/watch?v=VIDEO_ID",
-    language="en",  # Preferred language
-    format="segments"  # Get timestamped segments
-)
+# Get timestamped segments for an ID
+segments = extractor.get_transcript("dQw4w9WgXcQ", language="en")
+for seg in segments[:5]:
+    print(f"{seg['start']:.1f}s: {seg['text']}")
 
-# Parse as JSON for further processing
-segments = json.loads(result)
-for segment in segments:
-    print(f"{segment['start']:.1f}s: {segment['text']}")
-
-# Get statistics about the video
-stats = extractor.get_transcript_stats("VIDEO_URL")
-print(f"Video duration: {stats['total_duration']:.1f} seconds")
+# Get statistics about the transcript
+stats = get_transcript_stats(segments)
+print(f"Duration: {stats['duration_seconds']:.1f} seconds")
 print(f"Word count: {stats['word_count']} words")
 ```
 
@@ -234,6 +239,25 @@ Handles both YouTube's legacy and current transcript formats:
 - Comprehensive logging for debugging
 
 ## 🧪 Testing
+
+### Running the tests
+
+```bash
+# Using uv (recommended)
+uv run pytest -q
+
+# Or using your environment directly
+pytest -q
+
+# Run a specific test file or test
+uv run pytest tests/test_cli_batch.py -q
+uv run pytest -q -k test_get_transcript_text_joins_without_network
+
+# With coverage summary
+uv run pytest --maxfail=1 --disable-warnings -q --cov=yt_ts_extract --cov-report=term
+```
+
+Note: The suite assumes the package accepts only YouTube video IDs (not full URLs) in both library and CLI usage.
 
 The library has been tested with various video types:
 

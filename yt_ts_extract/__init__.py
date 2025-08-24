@@ -9,14 +9,14 @@ Usage:
     from yt_ts_extract import YouTubeTranscriptExtractor
     
     extractor = YouTubeTranscriptExtractor()
-    transcript = extractor.get_transcript("https://www.youtube.com/watch?v=VIDEO_ID")
+    transcript = extractor.get_transcript("VIDEO_ID")
     
     # CLI Usage
-    $ yt-transcript "https://www.youtube.com/watch?v=VIDEO_ID"
-    $ yt-transcript -f srt -o subtitles.srt "VIDEO_URL"
+    $ yt-transcript VIDEO_ID
+    $ yt-transcript -f srt -o subtitles.srt VIDEO_ID
 
 Features:
-    - Extract transcripts from YouTube videos via URL
+    - Extract transcripts from YouTube videos via video ID
     - Support for 26+ languages
     - Multiple output formats: plain text, SRT subtitles, timestamped segments, JSON
     - Batch processing for multiple videos
@@ -38,63 +38,63 @@ from .utils import (
     search_transcript,
     create_summary,
     get_transcript_stats,
-    batch_process_urls
+    batch_process_ids
 )
 
 # Convenience functions for common use cases
-def get_transcript(video_url: str, language: str = 'en') -> list:
+def get_transcript(video_id: str, language: str = 'en') -> list:
     """
     Quick function to get transcript segments.
     
     Args:
-        video_url: YouTube video URL
+        video_id: YouTube video ID
         language: Language code (default: 'en')
         
     Returns:
         List of transcript segments
         
     Example:
-        transcript = get_transcript("https://www.youtube.com/watch?v=dQw4w9WgXcQ")
+        transcript = get_transcript("dQw4w9WgXcQ")
     """
     extractor = YouTubeTranscriptExtractor()
-    return extractor.get_transcript(video_url, language)
+    return extractor.get_transcript(video_id, language)
 
 
-def get_transcript_text(video_url: str, language: str = 'en') -> str:
+def get_transcript_text(video_id: str, language: str = 'en') -> str:
     """
     Quick function to get transcript as plain text.
     
     Args:
-        video_url: YouTube video URL
+        video_id: YouTube video ID
         language: Language code (default: 'en')
         
     Returns:
         Transcript as a single string
         
     Example:
-        text = get_transcript_text("https://www.youtube.com/watch?v=dQw4w9WgXcQ")
+        text = get_transcript_text("dQw4w9WgXcQ")
     """
     extractor = YouTubeTranscriptExtractor()
-    return extractor.get_transcript_text(video_url, language)
+    return extractor.get_transcript_text(video_id, language)
 
 
-def get_available_languages(video_url: str) -> list:
+def get_available_languages(video_id: str) -> list:
     """
     Quick function to get available transcript languages.
     
     Args:
-        video_url: YouTube video URL
+        video_id: YouTube video ID
         
     Returns:
         List of available language dictionaries
         
     Example:
-        languages = get_available_languages("https://www.youtube.com/watch?v=dQw4w9WgXcQ")
+        languages = get_available_languages("dQw4w9WgXcQ")
         for lang in languages:
             print(f"{lang['name']} ({lang['code']})")
     """
     extractor = YouTubeTranscriptExtractor()
-    return extractor.get_available_languages(video_url)
+    return extractor.get_available_languages(video_id)
 
 
 # Module metadata
@@ -109,7 +109,7 @@ __all__ = [
     'search_transcript',
     'create_summary',
     'get_transcript_stats',
-    'batch_process_urls',
+    'batch_process_ids',
     
     # Convenience functions
     'get_transcript',

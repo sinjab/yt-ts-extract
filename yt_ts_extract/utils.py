@@ -26,7 +26,7 @@ def export_to_srt(transcript: List[Dict], filename: str = "transcript.srt") -> s
         from yt_ts_extract import get_transcript
         from yt_ts_extract.utils import export_to_srt
         
-        transcript = get_transcript("https://youtube.com/watch?v=...")
+        transcript = get_transcript("dQw4w9WgXcQ")
         srt_content = export_to_srt(transcript, "video_subtitles.srt")
     """
     def format_srt_timestamp(seconds: float) -> str:
@@ -78,7 +78,7 @@ def clean_transcript_text(text: str) -> str:
         from yt_ts_extract import get_transcript_text
         from yt_ts_extract.utils import clean_transcript_text
         
-        raw_text = get_transcript_text("https://youtube.com/watch?v=...")
+        raw_text = get_transcript_text("dQw4w9WgXcQ")
         clean_text = clean_transcript_text(raw_text)
     """
     # Remove excessive whitespace
@@ -116,7 +116,7 @@ def extract_keywords(transcript: List[Dict], top_n: int = 20) -> List[tuple]:
         from yt_ts_extract import get_transcript
         from yt_ts_extract.utils import extract_keywords
         
-        transcript = get_transcript("https://youtube.com/watch?v=...")
+        transcript = get_transcript("dQw4w9WgXcQ")
         keywords = extract_keywords(transcript, 15)
         for word, count in keywords:
             print(f"{word}: {count}")
@@ -167,7 +167,7 @@ def search_transcript(transcript: List[Dict], query: str, context_words: int = 5
         from yt_ts_extract import get_transcript
         from yt_ts_extract.utils import search_transcript
         
-        transcript = get_transcript("https://youtube.com/watch?v=...")
+        transcript = get_transcript("dQw4w9WgXcQ")
         matches = search_transcript(transcript, "artificial intelligence", context_words=10)
         for match in matches:
             print(f"[{match['timestamp']}] {match['text']}")
@@ -227,7 +227,7 @@ def create_summary(transcript: List[Dict], max_sentences: int = 5) -> str:
         from yt_ts_extract import get_transcript
         from yt_ts_extract.utils import create_summary
         
-        transcript = get_transcript("https://youtube.com/watch?v=...")
+        transcript = get_transcript("dQw4w9WgXcQ")
         summary = create_summary(transcript, max_sentences=3)
         print("Summary:", summary)
     """
@@ -275,7 +275,7 @@ def get_transcript_stats(transcript: List[Dict]) -> Dict:
         from yt_ts_extract import get_transcript
         from yt_ts_extract.utils import get_transcript_stats
         
-        transcript = get_transcript("https://youtube.com/watch?v=...")
+        transcript = get_transcript("dQw4w9WgXcQ")
         stats = get_transcript_stats(transcript)
         print(f"Duration: {stats['duration_formatted']}")
         print(f"Word count: {stats['word_count']}")
@@ -318,25 +318,25 @@ def get_transcript_stats(transcript: List[Dict]) -> Dict:
     }
 
 
-def batch_process_urls(urls: List[str], output_dir: str = "transcripts/") -> Dict:
+def batch_process_ids(video_ids: List[str], output_dir: str = "transcripts/") -> Dict:
     """
-    Process multiple YouTube URLs and save transcripts.
+    Process multiple YouTube video IDs and save transcripts.
     
     Args:
-        urls: List of YouTube URLs
+        video_ids: List of YouTube video IDs
         output_dir: Directory to save transcripts
     
     Returns:
         Processing results summary
     
     Example:
-        from yt_ts_extract.utils import batch_process_urls
+        from yt_ts_extract.utils import batch_process_ids
         
-        urls = [
-            "https://youtube.com/watch?v=video1",
-            "https://youtube.com/watch?v=video2"
+        ids = [
+            "dQw4w9WgXcQ",
+            "9bZkp7q19f0"
         ]
-        results = batch_process_urls(urls, "my_transcripts/")
+        results = batch_process_ids(ids, "my_transcripts/")
     """
     from .extractor import YouTubeTranscriptExtractor
     
@@ -351,15 +351,12 @@ def batch_process_urls(urls: List[str], output_dir: str = "transcripts/") -> Dic
     # Create output directory
     os.makedirs(output_dir, exist_ok=True)
     
-    for i, url in enumerate(urls, 1):
-        print(f"Processing {i}/{len(urls)}: {url}")
+    for i, video_id in enumerate(video_ids, 1):
+        print(f"Processing {i}/{len(video_ids)}: {video_id}")
         
         try:
-            # Extract video ID for filename
-            video_id = extractor.extract_video_id(url)
-            
             # Get transcript
-            transcript = extractor.get_transcript(url)
+            transcript = extractor.get_transcript(video_id)
             
             # Save as multiple formats
             base_filename = os.path.join(output_dir, f"{video_id}")
@@ -368,10 +365,10 @@ def batch_process_urls(urls: List[str], output_dir: str = "transcripts/") -> Dic
             with open(f"{base_filename}_segments.txt", 'w', encoding='utf-8') as f:
                 for segment in transcript:
                     timestamp = extractor._format_timestamp(segment['start'])
-                    f.write(f"[{timestamp}] {segment['text']}\\n")
+                    f.write(f"[{timestamp}] {segment['text']}\n")
             
             # Save as plain text
-            plain_text = extractor.get_transcript_text(url)
+            plain_text = extractor.get_transcript_text(video_id)
             with open(f"{base_filename}_text.txt", 'w', encoding='utf-8') as f:
                 f.write(clean_transcript_text(plain_text))
             
@@ -382,7 +379,6 @@ def batch_process_urls(urls: List[str], output_dir: str = "transcripts/") -> Dic
             stats = get_transcript_stats(transcript)
             
             results['successful'].append({
-                'url': url,
                 'video_id': video_id,
                 'files_created': [
                     f"{base_filename}_segments.txt",
@@ -394,7 +390,7 @@ def batch_process_urls(urls: List[str], output_dir: str = "transcripts/") -> Dic
             
         except Exception as e:
             results['failed'].append({
-                'url': url,
+                'video_id': video_id,
                 'error': str(e)
             })
         
@@ -404,7 +400,7 @@ def batch_process_urls(urls: List[str], output_dir: str = "transcripts/") -> Dic
     results['duration'] = results['end_time'] - results['start_time']
     
     # Print summary
-    print(f"\\nBatch processing completed!")
+    print(f"\nBatch processing completed!")
     print(f"Successful: {len(results['successful'])}")
     print(f"Failed: {len(results['failed'])}")
     print(f"Total time: {results['duration']}")
@@ -420,27 +416,27 @@ def demo_utilities():
     print("=" * 50)
     
     extractor = YouTubeTranscriptExtractor()
-    test_url = "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+    test_id = "dQw4w9WgXcQ"
     
     try:
-        print(f"Testing with URL: {test_url}")
-        transcript = extractor.get_transcript(test_url)
+        print(f"Testing with video ID: {test_id}")
+        transcript = extractor.get_transcript(test_id)
         
-        print("\\n1. Transcript Stats:")
+        print("\n1. Transcript Stats:")
         stats = get_transcript_stats(transcript)
         for key, value in stats.items():
             print(f"   {key}: {value}")
         
-        print("\\n2. Top Keywords:")
+        print("\n2. Top Keywords:")
         keywords = extract_keywords(transcript, 10)
         for word, count in keywords[:5]:
             print(f"   {word}: {count}")
         
-        print("\\n3. Sample SRT Export:")
+        print("\n3. Sample SRT Export:")
         srt_content = export_to_srt(transcript[:3], filename=None)  # Just first 3 segments
-        print("   " + srt_content.replace('\\n', '\\n   ')[:200] + "...")
+        print("   " + srt_content.replace('\n', '\n   ')[:200] + "...")
         
-        print("\\n4. Search Example:")
+        print("\n4. Search Example:")
         # This would work if the transcript contained the search term
         matches = search_transcript(transcript, "never", context_words=3)
         if matches:
@@ -449,7 +445,7 @@ def demo_utilities():
         else:
             print("   No matches found for 'never'")
         
-        print("\\n5. Summary:")
+        print("\n5. Summary:")
         summary = create_summary(transcript, max_sentences=2)
         print(f"   {summary[:200]}...")
         
@@ -457,7 +453,7 @@ def demo_utilities():
         print(f"Demo encountered expected error: {e}")
         print("This is normal due to YouTube's anti-bot protection.")
     
-    print(f"\\n{'='*50}")
+    print(f"\n{'='*50}")
     print("All utility functions are ready to use!")
 
 

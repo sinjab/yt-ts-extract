@@ -6,9 +6,6 @@ from yt_ts_extract.extractor import YouTubeTranscriptExtractor
 def test_get_available_languages_stubs_innertube(monkeypatch):
     e = YouTubeTranscriptExtractor()
 
-    def fake_extract_video_id(url):
-        return "dQw4w9WgXcQ"
-
     def fake_get_api_key_from_homepage(self):
         return "FAKE_KEY"
 
@@ -36,11 +33,10 @@ def test_get_available_languages_stubs_innertube(monkeypatch):
             },
         }
 
-    monkeypatch.setattr(YouTubeTranscriptExtractor, "extract_video_id", staticmethod(fake_extract_video_id))
     monkeypatch.setattr(YouTubeTranscriptExtractor, "get_api_key_from_homepage", fake_get_api_key_from_homepage)
     monkeypatch.setattr(YouTubeTranscriptExtractor, "call_innertube_api", fake_call_innertube_api)
 
-    langs = e.get_available_languages("https://youtu.be/any")
+    langs = e.get_available_languages("dQw4w9WgXcQ")
     assert langs == [
         {"code": "en", "name": "English", "auto_generated": False},
         {"code": "es", "name": "Español", "auto_generated": True},

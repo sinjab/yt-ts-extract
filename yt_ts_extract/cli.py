@@ -10,7 +10,7 @@ import os
 from .extractor import YouTubeTranscriptExtractor
 from .utils import (
     export_to_srt, clean_transcript_text, extract_keywords, 
-    search_transcript, create_summary, get_transcript_stats, batch_process_urls
+    search_transcript, create_summary, get_transcript_stats, batch_process_ids
 )
 
 
@@ -21,16 +21,16 @@ def main():
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
-  %(prog)s "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
-  %(prog)s -f srt -o subtitles.srt "https://youtu.be/dQw4w9WgXcQ"
-  %(prog)s -f stats --keywords 10 "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
-  %(prog)s --search "artificial intelligence" "https://www.youtube.com/watch?v=VIDEO_ID"
-  %(prog)s --batch urls.txt --output-dir transcripts/
+  %(prog)s dQw4w9WgXcQ
+  %(prog)s -f srt -o subtitles.srt dQw4w9WgXcQ
+  %(prog)s -f stats --keywords 10 dQw4w9WgXcQ
+  %(prog)s --search "artificial intelligence" dQw4w9WgXcQ
+  %(prog)s --batch ids.txt --output-dir transcripts/
         """
     )
     
     # Positional arguments
-    parser.add_argument('url', nargs='?', help='YouTube video URL')
+    parser.add_argument('video_id', nargs='?', help='YouTube video ID (11 characters)')
     
     # Output format options
     parser.add_argument('-f', '--format', choices=['text', 'segments', 'srt', 'stats'], 
@@ -50,7 +50,7 @@ Examples:
     parser.add_argument('--search', help='Search for specific text in transcript')
     
     # Batch processing
-    parser.add_argument('--batch', help='Process multiple URLs from file (one per line)')
+    parser.add_argument('--batch', help='Process multiple video IDs from file (one per line)')
     parser.add_argument('--list-languages', action='store_true',
                         help='List available languages for the video')
     
@@ -71,8 +71,8 @@ Examples:
         handle_batch_processing(args)
         return
     
-    if not args.url:
-        parser.error("URL is required unless using --batch or --examples")
+    if not args.video_id:
+        parser.error("VIDEO_ID is required unless using --batch or --examples")
     
     # Initialize extractor
     extractor = YouTubeTranscriptExtractor()
@@ -81,7 +81,7 @@ Examples:
         # List languages if requested
         if args.list_languages:
             print("Available languages:")
-            languages = extractor.get_available_languages(args.url)
+            languages = extractor.get_available_languages(args.video_id)
             for lang in languages:
                 status = "auto-generated" if lang['auto_generated'] else "manual"
                 print(f"  {lang['code']}: {lang['name']} ({status})")
@@ -89,13 +89,13 @@ Examples:
         
         # Extract transcript
         if args.verbose:
-            print(f"Extracting transcript from: {args.url}")
+            print(f"Extracting transcript for ID: {args.video_id}")
             if args.language:
                 print(f"Language: {args.language}")
         
         # Use 'en' as default if no language specified
         language = args.language or 'en'
-        transcript = extractor.get_transcript(args.url, language)
+        transcript = extractor.get_transcript(args.video_id, language)
         
         if args.verbose:
             print(f"Successfully extracted {len(transcript)} segments")
@@ -173,16 +173,16 @@ def handle_batch_processing(args):
         print(f"Error: File '{args.batch}' not found", file=sys.stderr)
         sys.exit(1)
     
-    # Read URLs from file
+    # Read video IDs from file
     with open(args.batch, 'r') as f:
-        urls = [line.strip() for line in f if line.strip() and not line.startswith('#')]
+        ids = [line.strip() for line in f if line.strip() and not line.startswith('#')]
     
-    if not urls:
-        print("Error: No valid URLs found in file", file=sys.stderr)
+    if not ids:
+        print("Error: No valid video IDs found in file", file=sys.stderr)
         sys.exit(1)
     
-    print(f"Processing {len(urls)} URLs...")
-    results = batch_process_urls(urls, args.output_dir)
+    print(f"Processing {len(ids)} video IDs...")
+    results = batch_process_ids(ids, args.output_dir)
     
     # Print detailed results
     print(f"\nDetailed Results:")
@@ -192,7 +192,7 @@ def handle_batch_processing(args):
     
     print(f"Failed: {len(results['failed'])}")
     for result in results['failed']:
-        print(f"  ❌ {result['url']}: {result['error']}")
+        print(f"  ❌ {result['video_id']}: {result['error']}")
 
 
 def run_examples():
@@ -201,16 +201,16 @@ def run_examples():
     print("=" * 50)
     
     examples = [
-        ("Basic text extraction", 'yt-transcript "https://www.youtube.com/watch?v=VIDEO_ID"'),
-        ("Save as SRT file", 'yt-transcript -f srt -o video.srt "https://youtu.be/VIDEO_ID"'),
-        ("Get transcript stats", 'yt-transcript -f stats "https://www.youtube.com/watch?v=VIDEO_ID"'),
-        ("Extract with summary", 'yt-transcript --summary 3 "https://www.youtube.com/watch?v=VIDEO_ID"'),
-        ("Get top keywords", 'yt-transcript --keywords 10 "https://www.youtube.com/watch?v=VIDEO_ID"'),
-        ("Search transcript", 'yt-transcript --search "keyword" "https://www.youtube.com/watch?v=VIDEO_ID"'),
-        ("Clean text output", 'yt-transcript --clean -o clean.txt "https://www.youtube.com/watch?v=VIDEO_ID"'),
-        ("List languages", 'yt-transcript --list-languages "https://www.youtube.com/watch?v=VIDEO_ID"'),
-        ("Batch processing", 'yt-transcript --batch urls.txt --output-dir transcripts/'),
-        ("Timestamped segments", 'yt-transcript -f segments "https://www.youtube.com/watch?v=VIDEO_ID"'),
+        ("Basic text extraction", 'yt-transcript dQw4w9WgXcQ'),
+        ("Save as SRT file", 'yt-transcript -f srt -o video.srt dQw4w9WgXcQ'),
+        ("Get transcript stats", 'yt-transcript -f stats dQw4w9WgXcQ'),
+        ("Extract with summary", 'yt-transcript --summary 3 dQw4w9WgXcQ'),
+        ("Get top keywords", 'yt-transcript --keywords 10 dQw4w9WgXcQ'),
+        ("Search transcript", 'yt-transcript --search "keyword" dQw4w9WgXcQ'),
+        ("Clean text output", 'yt-transcript --clean -o clean.txt dQw4w9WgXcQ'),
+        ("List languages", 'yt-transcript --list-languages dQw4w9WgXcQ'),
+        ("Batch processing", 'yt-transcript --batch ids.txt --output-dir transcripts/'),
+        ("Timestamped segments", 'yt-transcript -f segments dQw4w9WgXcQ'),
     ]
     
     for description, command in examples:
@@ -218,10 +218,10 @@ def run_examples():
         print(f"  {command}")
     
     print(f"\n{'='*50}")
-    print("Create a file 'urls.txt' with YouTube URLs (one per line) for batch processing.")
-    print("Example urls.txt content:")
-    print("  https://www.youtube.com/watch?v=dQw4w9WgXcQ")
-    print("  https://youtu.be/another_video_id")
+    print("Create a file 'ids.txt' with YouTube video IDs (one per line) for batch processing.")
+    print("Example ids.txt content:")
+    print("  dQw4w9WgXcQ")
+    print("  9bZkp7q19f0")
     print("  # This is a comment - lines starting with # are ignored")
 
 

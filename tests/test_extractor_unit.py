@@ -3,13 +3,6 @@ import pytest
 from yt_ts_extract.extractor import YouTubeTranscriptExtractor
 
 
-def test_extract_video_id_various_urls():
-    e = YouTubeTranscriptExtractor()
-    assert e.extract_video_id("https://www.youtube.com/watch?v=dQw4w9WgXcQ") == "dQw4w9WgXcQ"
-    assert e.extract_video_id("https://youtu.be/dQw4w9WgXcQ") == "dQw4w9WgXcQ"
-    assert e.extract_video_id("https://www.youtube.com/embed/dQw4w9WgXcQ") == "dQw4w9WgXcQ"
-
-
 @pytest.mark.parametrize(
     "seconds, expected",
     [
@@ -81,9 +74,9 @@ def test_get_transcript_text_joins_without_network(monkeypatch):
         {"text": "two", "start": 1.0, "duration": 1.0},
     ]
 
-    def fake_get_transcript(self, url, language="en", prefer_manual=True):
+    def fake_get_transcript(self, video_id, language="en", prefer_manual=True):
         return fake_segments
 
     monkeypatch.setattr(YouTubeTranscriptExtractor, "get_transcript", fake_get_transcript)
-    text = e.get_transcript_text("https://youtu.be/abc123def45", "en")
+    text = e.get_transcript_text("abc123def45", "en")
     assert text == "one two"
