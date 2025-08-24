@@ -24,7 +24,7 @@ A robust Python tool for extracting YouTube video transcripts with multi-languag
 
 ```bash
 # Navigate to project directory
-cd /Users/khs/Documents/projects/test
+cd /Users/khs/Documents/projects/yt_ts_extract
 
 # Basic transcript extraction
 uv run python cli.py "https://www.youtube.com/watch?v=VIDEO_ID"
@@ -47,8 +47,7 @@ uv run python examples.py
 ├── utils.py             # Utility functions (440 lines)
 ├── examples.py          # Demo scripts (321 lines)
 ├── README.md            # Documentation
-├── pyproject.toml       # Dependencies
-└── test.srt            # Sample output
+└── pyproject.toml       # Dependencies
 ```
 
 ## Testing Results
