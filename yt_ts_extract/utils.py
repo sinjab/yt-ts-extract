@@ -318,7 +318,7 @@ def get_transcript_stats(transcript: List[Dict]) -> Dict:
     }
 
 
-def batch_process_ids(video_ids: List[str], output_dir: str = "transcripts/", proxy: Optional[str] = None) -> Dict:
+def batch_process_ids(video_ids: List[str], output_dir: str = "transcripts/", proxy: Optional[str] = None, proxy_manager=None) -> Dict:
     """
     Process multiple YouTube video IDs and save transcripts.
     
@@ -326,6 +326,7 @@ def batch_process_ids(video_ids: List[str], output_dir: str = "transcripts/", pr
         video_ids: List of YouTube video IDs
         output_dir: Directory to save transcripts
         proxy: Proxy URL in format "http://username:password@host:port" or "http://host:port" (default: None)
+        proxy_manager: ProxyManager instance for rotating proxies (default: None)
     
     Returns:
         Processing results summary
@@ -338,10 +339,15 @@ def batch_process_ids(video_ids: List[str], output_dir: str = "transcripts/", pr
             "9bZkp7q19f0"
         ]
         results = batch_process_ids(ids, "my_transcripts/", proxy="http://user:pass@host:port")
+        
+        # Or with proxy rotation:
+        from yt_ts_extract.proxy_manager import ProxyManager
+        proxy_manager = ProxyManager.from_file("proxies.txt")
+        results = batch_process_ids(ids, "my_transcripts/", proxy_manager=proxy_manager)
     """
     from .extractor import YouTubeTranscriptExtractor
     
-    extractor = YouTubeTranscriptExtractor(proxy=proxy)
+    extractor = YouTubeTranscriptExtractor(proxy=proxy, proxy_manager=proxy_manager)
     results = {
         'successful': [],
         'failed': [],

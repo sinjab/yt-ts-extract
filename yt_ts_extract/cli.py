@@ -8,6 +8,7 @@ import argparse
 import sys
 import os
 from .extractor import YouTubeTranscriptExtractor
+from .proxy_manager import ProxyManager
 from .utils import (
     export_to_srt, clean_transcript_text, extract_keywords, 
     search_transcript, create_summary, get_transcript_stats, batch_process_ids
@@ -77,6 +78,12 @@ Examples:
                         help='Minimum delay between requests for rate limiting (default: 2)')
     parser.add_argument('--proxy', 
                         help='🔒 Proxy URL for network routing (e.g., "http://user:pass@host:port", "https://host:port", "socks5://host:port")')
+    parser.add_argument('--proxy-list', 
+                        help='🔄 Proxy list file for rotation (space/tab separated: Address Port Username Password)')
+    parser.add_argument('--rotation-strategy', choices=['random', 'round_robin', 'least_used'], default='random',
+                        help='🔄 Proxy rotation strategy (default: random)')
+    parser.add_argument('--health-check', action='store_true',
+                        help='🔄 Perform health check on all proxies before starting')
     
     args = parser.parse_args()
     
@@ -93,13 +100,48 @@ Examples:
         parser.error("VIDEO_ID is required unless using --batch or --examples")
     
     # Initialize extractor with resilience options
-    extractor = YouTubeTranscriptExtractor(
-        timeout=args.timeout,
-        max_retries=args.retries,
-        backoff_factor=args.backoff,
-        min_delay=args.min_delay,
-        proxy=args.proxy,
-    )
+    if args.proxy_list:
+        # Proxy rotation mode
+        try:
+            proxy_manager = ProxyManager.from_file(
+                args.proxy_list,
+                rotation_strategy=args.rotation_strategy
+            )
+            
+            if args.health_check:
+                print("Performing proxy health check...")
+                health_results = proxy_manager.health_check_all()
+                healthy_count = sum(1 for healthy in health_results.values() if healthy)
+                print(f"Health check complete: {healthy_count}/{len(proxy_manager)} proxies healthy")
+                
+                if healthy_count == 0:
+                    print("Warning: No healthy proxies found!")
+            
+            extractor = YouTubeTranscriptExtractor(
+                timeout=args.timeout,
+                max_retries=args.retries,
+                backoff_factor=args.backoff,
+                min_delay=args.min_delay,
+                proxy_manager=proxy_manager,
+            )
+            
+            # Show proxy stats
+            stats = proxy_manager.get_stats()
+            print(f"🔄 Using proxy rotation: {stats['active_proxies']}/{stats['total_proxies']} proxies active, strategy: {stats['rotation_strategy']}")
+            
+        except Exception as e:
+            print(f"Error loading proxy list: {e}", file=sys.stderr)
+            sys.exit(1)
+            
+    else:
+        # Single proxy or no proxy mode
+        extractor = YouTubeTranscriptExtractor(
+            timeout=args.timeout,
+            max_retries=args.retries,
+            backoff_factor=args.backoff,
+            min_delay=args.min_delay,
+            proxy=args.proxy,
+        )
     
     try:
         # List languages if requested
@@ -206,7 +248,21 @@ def handle_batch_processing(args):
         sys.exit(1)
     
     print(f"Processing {len(ids)} video IDs...")
-    results = batch_process_ids(ids, args.output_dir, proxy=args.proxy)
+    
+    if args.proxy_list:
+        # Use proxy rotation for batch processing
+        try:
+            proxy_manager = ProxyManager.from_file(
+                args.proxy_list,
+                rotation_strategy=args.rotation_strategy
+            )
+            results = batch_process_ids(ids, args.output_dir, proxy_manager=proxy_manager)
+        except Exception as e:
+            print(f"Error loading proxy list for batch processing: {e}", file=sys.stderr)
+            sys.exit(1)
+    else:
+        # Use single proxy or no proxy
+        results = batch_process_ids(ids, args.output_dir, proxy=args.proxy)
     
     # Print detailed results
     print(f"\nDetailed Results:")
@@ -245,6 +301,12 @@ def run_examples():
         ("Proxy with retries", 'yt-transcript --proxy "http://host:port" --retries 5 dQw4w9WgXcQ'),
         ("Batch processing with proxy", 'yt-transcript --batch ids.txt --proxy "http://host:port" --output-dir transcripts/'),
         ("Proxy with all options", 'yt-transcript --proxy "http://user:pass@host:port" --timeout 60 --retries 5 --min-delay 1.0 dQw4w9WgXcQ'),
+        ("", ""),  # Empty line for separation
+        ("🔄 PROXY ROTATION EXAMPLES:", ""),
+        ("Proxy list file", 'yt-transcript --proxy-list proxies.txt dQw4w9WgXcQ'),
+        ("Proxy rotation with strategy", 'yt-transcript --proxy-list proxies.txt --rotation-strategy round_robin dQw4w9WgXcQ'),
+        ("Proxy rotation with health check", 'yt-transcript --proxy-list proxies.txt --health-check dQw4w9WgXcQ'),
+        ("Batch with proxy rotation", 'yt-transcript --batch ids.txt --proxy-list proxies.txt --output-dir transcripts/'),
     ]
     
     for description, command in examples:

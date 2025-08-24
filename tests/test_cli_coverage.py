@@ -325,6 +325,8 @@ class TestCLIFunctionCoverage:
         args = MagicMock()
         args.batch = str(ids_file)
         args.output_dir = str(tmp_path / "out")
+        args.proxy_list = None  # No proxy rotation for this test
+        args.proxy = None  # No single proxy for this test
         
         handle_batch_processing(args)
         out = capsys.readouterr().out

@@ -62,7 +62,7 @@ class TestYouTubeTranscriptExtractorProxy:
             extractor = YouTubeTranscriptExtractor(proxy=proxy_url)
         
         # Check that proxy is logged (without credentials for security)
-        assert "Configured proxy: host:port" in caplog.text
+        assert "Configured single proxy: host:port" in caplog.text
     
     def test_proxy_logging_no_auth(self, caplog):
         """Test that proxy configuration is logged without auth"""
@@ -71,7 +71,7 @@ class TestYouTubeTranscriptExtractorProxy:
             extractor = YouTubeTranscriptExtractor(proxy=proxy_url)
         
         # Check that proxy is logged
-        assert "Configured proxy: http://host:port" in caplog.text
+        assert "Configured single proxy: http://host:port" in caplog.text
     
     def test_proxy_preserved_in_session(self):
         """Test that proxy configuration is preserved in the session"""

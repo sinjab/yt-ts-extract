@@ -42,7 +42,7 @@ class YouTubeTranscriptExtractor:
         languages = extractor.get_available_languages("dQw4w9WgXcQ")
     """
     
-    def __init__(self, *, timeout: float = 30, max_retries: int = 3, backoff_factor: float = 0.75, min_delay: float = 2, proxy: Optional[str] = None):
+    def __init__(self, *, timeout: float = 30, max_retries: int = 3, backoff_factor: float = 0.75, min_delay: float = 2, proxy: Optional[str] = None, proxy_manager=None):
         """Initialize the extractor with session, headers, and resilience controls.
 
         Args:
@@ -51,6 +51,7 @@ class YouTubeTranscriptExtractor:
             backoff_factor: base backoff factor for retries (default: 0.75)
             min_delay: minimum delay between requests for rate limiting (default: 2)
             proxy: proxy URL in format "http://username:password@host:port" or "http://host:port" (default: None)
+            proxy_manager: ProxyManager instance for rotating proxies (default: None)
         """
         self.session = requests.Session()
         self.last_request_time = 0
@@ -60,13 +61,18 @@ class YouTubeTranscriptExtractor:
         self.max_retries = int(max_retries)
         self.backoff_factor = float(backoff_factor)
         
-        # Configure proxy if provided
+        # Configure proxy or proxy manager
+        self.proxy_manager = proxy_manager
         if proxy:
+            # Single proxy mode (backward compatibility)
             self.session.proxies = {
                 'http': proxy,
                 'https': proxy
             }
-            logger.info(f"Configured proxy: {proxy.split('@')[-1] if '@' in proxy else proxy}")
+            logger.info(f"Configured single proxy: {proxy.split('@')[-1] if '@' in proxy else proxy}")
+        elif proxy_manager:
+            # Proxy rotation mode
+            logger.info(f"Configured proxy rotation with {len(proxy_manager)} proxies, strategy: {proxy_manager.rotation_strategy}")
         
         # Essential headers to mimic legitimate browser requests
         self.session.headers.update({
@@ -102,26 +108,63 @@ class YouTubeTranscriptExtractor:
         """
         attempt = 0
         last_exc = None
+        current_proxy = None
+        
         while attempt < self.max_retries:
             try:
-                caller = (self.session if use_session else requests)
+                # Handle proxy rotation if enabled
+                if self.proxy_manager and attempt > 0:
+                    # Get next proxy for retry
+                    current_proxy = self.proxy_manager.get_next_proxy()
+                    if current_proxy:
+                        # Create a new session with the new proxy
+                        temp_session = requests.Session()
+                        temp_session.headers.update(self.session.headers)
+                        temp_session.proxies = {
+                            'http': current_proxy.url,
+                            'https': current_proxy.url
+                        }
+                        caller = temp_session
+                        logger.info(f"Retrying with proxy: {current_proxy.display_name}")
+                    else:
+                        # No more proxies available, use original session
+                        caller = self.session
+                        logger.warning("No more proxies available, using original session")
+                else:
+                    caller = (self.session if use_session else requests)
+                
                 if 'timeout' not in kwargs:
                     kwargs['timeout'] = self.timeout
+                
                 if method.lower() == 'get':
-                    return caller.get(url, **kwargs)
+                    response = caller.get(url, **kwargs)
                 elif method.lower() == 'post':
-                    return caller.post(url, **kwargs)
+                    response = caller.post(url, **kwargs)
                 else:
                     raise ValueError(f"Unsupported method: {method}")
+                
+                # Mark proxy as successful if we used one
+                if current_proxy and self.proxy_manager:
+                    self.proxy_manager.mark_proxy_success(current_proxy)
+                
+                return response
+                
             except (requests.Timeout, requests.ConnectionError, requests.HTTPError, requests.RequestException) as e:
                 last_exc = e
                 attempt += 1
+                
+                # Mark proxy as failed if we used one
+                if current_proxy and self.proxy_manager:
+                    self.proxy_manager.mark_proxy_failed(current_proxy, str(e))
+                
                 if attempt >= self.max_retries:
                     break
+                
                 # Exponential backoff with jitter
                 delay = (self.backoff_factor * (2 ** (attempt - 1))) + uniform(0, 0.5)
                 logger.warning(f"Request failed (attempt {attempt}/{self.max_retries}) for {url}: {e}. Retrying in {delay:.2f}s")
                 time.sleep(delay)
+        
         # Re-raise the last exception to be handled by callers preserving messages
         raise last_exc
     
@@ -548,3 +591,23 @@ class YouTubeTranscriptExtractor:
             return f"{hours:02d}:{minutes:02d}:{secs:02d}"
         else:
             return f"{minutes:02d}:{secs:02d}"
+    
+    def get_proxy_stats(self) -> Optional[Dict]:
+        """Get proxy statistics if proxy rotation is enabled.
+        
+        Returns:
+            Proxy statistics dictionary or None if no proxy manager
+        """
+        if self.proxy_manager:
+            return self.proxy_manager.get_stats()
+        return None
+    
+    def health_check_proxies(self) -> Optional[Dict[str, bool]]:
+        """Perform health check on all proxies if proxy rotation is enabled.
+        
+        Returns:
+            Health check results dictionary or None if no proxy manager
+        """
+        if self.proxy_manager:
+            return self.proxy_manager.health_check_all()
+        return None

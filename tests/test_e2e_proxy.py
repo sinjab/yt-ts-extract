@@ -26,7 +26,7 @@ class TestProxyE2E:
             extractor = YouTubeTranscriptExtractor(proxy=proxy_url)
             
             # Verify proxy was logged (without credentials for security)
-            mock_logger.assert_called_with("Configured proxy: proxy-host:8080")
+            mock_logger.assert_called_with("Configured single proxy: proxy-host:8080")
             
             # Verify session has proxy configured
             assert extractor.session.proxies['http'] == proxy_url

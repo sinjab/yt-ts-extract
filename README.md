@@ -113,6 +113,9 @@ Options:
   --backoff FLOAT        Exponential backoff factor (default: 0.75)
   --min-delay FLOAT      Minimum delay between requests for rate limiting (default: 2)
   --proxy TEXT           Proxy URL (e.g., "http://user:pass@host:port" or "http://host:port")
+  --proxy-list PATH      Proxy list file for rotation (space/tab separated: Address Port Username Password)
+  --rotation-strategy [random|round_robin|least_used]  Proxy rotation strategy (default: random)
+  --health-check         Perform health check on all proxies before starting
   --help                 Show this message and exit
 ```
 
@@ -132,11 +135,19 @@ yt-transcript dQw4w9WgXcQ --proxy "http://user:pass@host:port"
 
 # Proxy with custom timeout
 yt-transcript dQw4w9WgXcQ --proxy "http://host:port" --timeout 60
+
+# Proxy rotation with health check
+yt-transcript dQw4w9WgXcQ --proxy-list proxies.txt --health-check
+
+# Proxy rotation with custom strategy and timeout
+yt-transcript dQw4w9WgXcQ --proxy-list proxies.txt --rotation-strategy round_robin --timeout 45
 ```
 
 ### Proxy Support
 
-The tool supports HTTP, HTTPS, and SOCKS proxies for network routing:
+The tool supports both single proxies and **proxy rotation** for enhanced reliability:
+
+#### Single Proxy
 
 ```bash
 # HTTP proxy with authentication
@@ -152,21 +163,102 @@ yt-transcript --proxy "socks5://user:pass@proxy-host:1080" dQw4w9WgXcQ
 yt-transcript --batch ids.txt --proxy "http://host:port" --output-dir transcripts/
 ```
 
+#### 🔄 Proxy Rotation (NEW!)
+
+Load multiple proxies from a file and automatically rotate between them:
+
+```bash
+# Basic proxy rotation
+yt-transcript --proxy-list proxies.txt dQw4w9WgXcQ
+
+# With rotation strategy
+yt-transcript --proxy-list proxies.txt --rotation-strategy round_robin dQw4w9WgXcQ
+
+# With health check
+yt-transcript --proxy-list proxies.txt --health-check dQw4w9WgXcQ
+
+# Batch processing with proxy rotation
+yt-transcript --batch ids.txt --proxy-list proxies.txt --output-dir transcripts/
+```
+
+**Proxy List File Format** (`proxies.txt`):
+```
+Address Port Username Password
+23.95.150.145 6114 mhzbhrwb yj2veiaafrbu
+198.23.239.134 6540 mhzbhrwb yj2veiaafrbu
+45.38.107.97 6014 mhzbhrwb yj2veiaafrbu
+64.137.96.74 6641 mhzbhrwb yj2veiaafrbu
+216.10.27.159 6837 mhzbhrwb yj2veiaafrbu
+136.0.207.84 6661 mhzbhrwb yj2veiaafrbu
+```
+
+> **Note**: The above proxy list has been tested and verified to work with the YouTube transcript extractor. These proxies support HTTP authentication and are configured for reliable transcript extraction.
+
+**Rotation Strategies:**
+- `random`: Random proxy selection (default)
+- `round_robin`: Cycle through proxies in order
+- `least_used`: Select least recently used proxy
+
 In Python code:
 
 ```python
-from yt_ts_extract import YouTubeTranscriptExtractor
+from yt_ts_extract import YouTubeTranscriptExtractor, ProxyManager
 
-# Initialize with proxy
+# Single proxy
 extractor = YouTubeTranscriptExtractor(
     proxy="http://user:pass@host:port",
     timeout=30,
     max_retries=3
 )
 
-# Use convenience functions with proxy
-from yt_ts_extract import get_transcript
-transcript = get_transcript("dQw4w9WgXcQ", proxy="http://host:port")
+# Proxy rotation
+proxy_manager = ProxyManager.from_file("proxies.txt", rotation_strategy="round_robin")
+extractor = YouTubeTranscriptExtractor(
+    proxy_manager=proxy_manager,
+    timeout=30,
+    max_retries=3
+)
+
+# Convenience functions with proxy rotation
+from yt_ts_extract import get_transcript_with_proxy_rotation
+transcript = get_transcript_with_proxy_rotation("dQw4w9WgXcQ", "proxies.txt")
+```
+
+**Proxy Rotation Best Practices:**
+- **Health Checks**: Use `--health-check` to verify proxy connectivity before processing
+- **Rotation Strategy**: Use `round_robin` for even distribution, `least_used` for load balancing
+- **Failover**: Failed proxies are automatically deactivated and reactivated after cooldown
+- **Rate Limiting**: Each proxy respects minimum delay between requests
+- **Monitoring**: Check proxy stats with `extractor.get_proxy_stats()`
+
+**Troubleshooting:**
+- If proxies fail health checks, verify credentials and connectivity
+- Increase `--timeout` for slower proxy connections
+- Use `--retries` to handle temporary proxy failures
+- Monitor proxy health during batch processing
+
+**Advanced Proxy Management:**
+```python
+from yt_ts_extract import ProxyManager
+
+# Custom proxy manager settings
+proxy_manager = ProxyManager(
+    proxy_configs=ProxyManager.from_file("proxies.txt").proxy_configs,
+    rotation_strategy="least_used",
+    health_check_url="https://www.youtube.com",  # Custom health check URL
+    health_check_timeout=15.0,
+    max_failures=2,  # Deactivate after 2 failures
+    failure_cooldown=300.0,  # 5 minutes cooldown
+    min_delay_between_requests=2.0  # 2 seconds between requests
+)
+
+# Health monitoring
+health_results = proxy_manager.health_check_all()
+stats = proxy_manager.get_stats()
+print(f"Active proxies: {stats['active_proxies']}/{stats['total_proxies']}")
+
+# Manual proxy management
+proxy_manager.reactivate_proxies()  # Reactivate failed proxies after cooldown
 ```
 
 ## 📊 Output Formats

@@ -31,6 +31,7 @@ __description__ = "YouTube transcript extraction with multi-language support"
 
 # Main API exports
 from .extractor import YouTubeTranscriptExtractor
+from .proxy_manager import ProxyManager, ProxyConfig
 from .utils import (
     export_to_srt,
     clean_transcript_text, 
@@ -105,10 +106,58 @@ def get_available_languages(video_id: str, proxy: Optional[str] = None, **extrac
     return extractor.get_available_languages(video_id)
 
 
+def get_transcript_with_proxy_rotation(video_id: str, proxy_list_file: str, language: str = 'en', rotation_strategy: str = 'random', **extractor_options) -> list:
+    """
+    Quick function to get transcript using proxy rotation.
+    
+    Args:
+        video_id: YouTube video ID
+        proxy_list_file: Path to proxy list file
+        language: Language code (default: 'en')
+        rotation_strategy: Proxy rotation strategy (default: 'random')
+        
+    Returns:
+        List of transcript segments
+        
+    Example:
+        transcript = get_transcript_with_proxy_rotation("dQw4w9WgXcQ", "proxies.txt")
+        transcript = get_transcript_with_proxy_rotation("dQw4w9WgXcQ", "proxies.txt", rotation_strategy="round_robin")
+    """
+    proxy_manager = ProxyManager.from_file(proxy_list_file, rotation_strategy=rotation_strategy)
+    extractor = YouTubeTranscriptExtractor(proxy_manager=proxy_manager, **extractor_options)
+    return extractor.get_transcript(video_id, language)
+
+
+def get_transcript_text_with_proxy_rotation(video_id: str, proxy_list_file: str, language: str = 'en', rotation_strategy: str = 'random', **extractor_options) -> str:
+    """
+    Quick function to get transcript as plain text using proxy rotation.
+    
+    Args:
+        video_id: YouTube video ID
+        proxy_list_file: Path to proxy list file
+        language: Language code (default: 'en')
+        rotation_strategy: Proxy rotation strategy (default: 'random')
+        
+    Returns:
+        Transcript as a single string
+        
+    Example:
+        text = get_transcript_text_with_proxy_rotation("dQw4w9WgXcQ", "proxies.txt")
+        text = get_transcript_text_with_proxy_rotation("dQw4w9WgXcQ", "proxies.txt", rotation_strategy="round_robin")
+    """
+    proxy_manager = ProxyManager.from_file(proxy_list_file, rotation_strategy=rotation_strategy)
+    extractor = YouTubeTranscriptExtractor(proxy_manager=proxy_manager, **extractor_options)
+    return extractor.get_transcript_text(video_id, language)
+
+
 # Module metadata
 __all__ = [
     # Main class
     'YouTubeTranscriptExtractor',
+    
+    # Proxy management
+    'ProxyManager',
+    'ProxyConfig',
     
     # Utility functions
     'export_to_srt',
@@ -122,5 +171,7 @@ __all__ = [
     # Convenience functions
     'get_transcript',
     'get_transcript_text',
-    'get_available_languages'
+    'get_available_languages',
+    'get_transcript_with_proxy_rotation',
+    'get_transcript_text_with_proxy_rotation'
 ]
